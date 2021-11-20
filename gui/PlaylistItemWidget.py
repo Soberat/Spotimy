@@ -20,9 +20,11 @@ class PlaylistItemWidget(QWidget):
         self.indexLabel.setAlignment(Qt.AlignCenter)
         self.coverLabel: QLabel = QLabel()
         if track.albumCoverUri is not None:
-            self.coverLabel.setPixmap(get_image(track.albumCoverUri).scaled(35, 35, transformMode=Qt.SmoothTransformation))
+            self.coverLabel.setPixmap(
+                get_image(track.albumCoverUri).scaled(35, 35, transformMode=Qt.SmoothTransformation))
         else:
-            self.coverLabel.setPixmap(QPixmap('track_placeholder.png').scaled(35, 35, transformMode=Qt.SmoothTransformation))
+            self.coverLabel.setPixmap(
+                QPixmap('track_placeholder.png').scaled(35, 35, transformMode=Qt.SmoothTransformation))
         self.titleLabel = QLabel(track.title)
         self.titleLabel.setFixedWidth(400)
         self.titleLabel.setFont(QFont("Gotham Book", 9, QFont.Bold))
@@ -35,7 +37,7 @@ class PlaylistItemWidget(QWidget):
 
         time = track.runtime / 1000
         minutes = int(time / 60)
-        seconds = int(time - 60*minutes)
+        seconds = int(time - 60 * minutes)
         self.runtimeLabel = QLabel(f"{minutes:02d}:{seconds:02d}")
         self.runtimeLabel.setFixedWidth(60)
 

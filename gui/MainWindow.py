@@ -5,6 +5,15 @@ from PlaylistListViewWidget import PlaylistListViewWidget
 from Spotify import Spotify, Playlist
 from gui.PlaylistViewWidget import PlaylistViewWidget
 
+# References:
+# https://www.flaticon.com/free-icon/playlist_565266?term=playlist&page=1&position=5&page=1&position=5&related_id=565266&origin=search
+# https://www.flaticon.com/premium-icon/musical-note_461146?term=note&page=1&position=12&page=1&position=12&related_id=461146&origin=search
+# https://www.flaticon.com/free-icon/musical-note_898945?term=note&page=1&position=69&page=1&position=69&related_id=898945&origin=search
+
+# TODO: Creating cache folders
+# TODO: Clearing old playlist cache
+# TODO: Save snapshot of reordered playlist
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -49,9 +58,14 @@ class MainWindow(QMainWindow):
         if playlist.name not in self.playlistViews.keys():
             self.playlistViews[playlist.name] = (PlaylistViewWidget(playlist), self.spotify.get_playlist_tracks(playlist))
 
+        try:
+            self.playlistView.trackList.orderChanged.disconnect(self.update_order)
+        except TypeError:
+            pass
         self.playlistView.setParent(None)
         self.playlistView, self.trackGenerator = self.playlistViews[playlist.name]
         self.playlistView.setParent(self)
+        self.playlistView.trackList.orderChanged.connect(self.update_order)
         self.centralWidgetLayout.addWidget(self.playlistView, 0, 1)
 
         self.trackTimer = QTimer().singleShot(0, self.populate_playlist_view)
@@ -66,6 +80,9 @@ class MainWindow(QMainWindow):
 
         self.playlistView.add_track(track)
         self.trackTimer = QTimer().singleShot(0, self.populate_playlist_view)
+
+    def update_order(self, x, y):
+        self.spotify.reorder_playlist(self.playlistView.playlist.id, x, y)
 
 
 app = QApplication(sys.argv)

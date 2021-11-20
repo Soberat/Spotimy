@@ -105,3 +105,6 @@ class Spotify:
 
             with open(f'./cache/playlists/{playlist.snapshotId}', 'w') as snapshotFile:
                 json.dump(snapshot, snapshotFile)
+
+    def reorder_playlist(self, playlistId, rangeStart, insertBefore, snapshotId=None):
+        newSnapshotId = self.sp.playlist_reorder_items(playlist_id=playlistId, range_start=rangeStart, insert_before=insertBefore, snapshot_id=snapshotId)

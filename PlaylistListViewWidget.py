@@ -5,8 +5,6 @@ from Spotify import Playlist
 from gui.PlaylistListItemWidget import PlaylistListItemWidget
 
 
-# TODO: Disallow new selection while dragging
-
 class PlaylistListViewWidget(QWidget):
     selectionChanged = pyqtSignal(Playlist)
 
