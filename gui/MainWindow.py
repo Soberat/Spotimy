@@ -16,6 +16,7 @@ class MainWindow(QMainWindow):
         self.trackGenerator = None
         self.playlistViews = dict()
         self.playlistGenerators = dict()
+        self.trackTimer = None
 
         self.playlistListView = PlaylistListViewWidget()
         for playlist in self.spotify.get_user_playlists():
@@ -37,6 +38,14 @@ class MainWindow(QMainWindow):
         return centralWidget
 
     def change_playlist(self, playlist: Playlist):
+        if playlist.name == PlaylistListViewWidget.dummyPlaylist.name:
+            self.playlistView.setParent(None)
+            if self.trackTimer is not None:
+                self.trackTimer.stop()
+            self.playlistView = PlaylistViewWidget(PlaylistListViewWidget.dummyPlaylist)
+            self.playlistView.setParent(self)
+            self.centralWidgetLayout.addWidget(self.playlistView, 0, 1)
+            return
         if playlist.name not in self.playlistViews.keys():
             self.playlistViews[playlist.name] = (PlaylistViewWidget(playlist), self.spotify.get_playlist_tracks(playlist))
 
@@ -45,7 +54,7 @@ class MainWindow(QMainWindow):
         self.playlistView.setParent(self)
         self.centralWidgetLayout.addWidget(self.playlistView, 0, 1)
 
-        QTimer().singleShot(0, self.populate_playlist_view)
+        self.trackTimer = QTimer().singleShot(0, self.populate_playlist_view)
 
     def populate_playlist_view(self):
         try:
@@ -56,7 +65,7 @@ class MainWindow(QMainWindow):
             return
 
         self.playlistView.add_track(track)
-        QTimer().singleShot(0, self.populate_playlist_view)
+        self.trackTimer = QTimer().singleShot(0, self.populate_playlist_view)
 
 
 app = QApplication(sys.argv)
