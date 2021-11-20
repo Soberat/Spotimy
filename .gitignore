@@ -2,3 +2,4 @@
 /client_secret.json
 /.cache
 /Secrets.py
+/gui/cache/*

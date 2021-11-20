@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel
 
+from CachingImageGetter import get_image
 from Spotify import Playlist
 
 
@@ -17,8 +18,10 @@ class PlaylistListItemWidget(QWidget):
         self.playlist = playlist
 
         self.imageLabel = QLabel()
-        # self.imageLabel.setFixedWidth(30)
-        self.imageLabel.setPixmap(QPixmap(playlist.image).scaled(30, 30, transformMode=Qt.SmoothTransformation))
+        if playlist.image is not None:
+            self.imageLabel.setPixmap(get_image(playlist.image).scaled(50, 50, transformMode=Qt.SmoothTransformation))
+        else:
+            self.imageLabel.setPixmap(QPixmap('playlist_placeholder.png').scaled(50, 50, transformMode=Qt.SmoothTransformation))
         self.nameLabel = QLabel(playlist.name)
         self.nameLabel.setFont(QFont("ComicSans", 10, QFont.Bold))
 

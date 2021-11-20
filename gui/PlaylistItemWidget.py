@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QVBoxLayout
 
+from CachingImageGetter import get_image
 from Spotify import Track
 
 
@@ -18,7 +19,10 @@ class PlaylistItemWidget(QWidget):
         self.indexLabel.setFixedWidth(25)
         self.indexLabel.setAlignment(Qt.AlignCenter)
         self.coverLabel: QLabel = QLabel()
-        self.coverLabel.setPixmap(QPixmap(track.albumCoverUri).scaled(35, 35, transformMode=Qt.SmoothTransformation))
+        if track.albumCoverUri is not None:
+            self.coverLabel.setPixmap(get_image(track.albumCoverUri).scaled(35, 35, transformMode=Qt.SmoothTransformation))
+        else:
+            self.coverLabel.setPixmap(QPixmap('track_placeholder.png').scaled(35, 35, transformMode=Qt.SmoothTransformation))
         self.titleLabel = QLabel(track.title)
         self.titleLabel.setFont(QFont("Gotham Book", 9, QFont.Bold))
         self.artistsLabel = QLabel(', '.join(track.artists))

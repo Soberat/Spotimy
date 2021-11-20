@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QFont, QImage, QBitmap
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QAbstractItemView
 
+from CachingImageGetter import get_image
 from Spotify import Playlist
 from gui.PlaylistItemWidget import PlaylistItemWidget
 
@@ -17,7 +18,7 @@ class PlaylistViewWidget(QWidget):
         self.mainLayout = QVBoxLayout()
 
         self.coverLabel = QLabel()
-        self.coverLabel.setPixmap(QPixmap("Pandora's Box.png").scaled(192, 192, transformMode=Qt.SmoothTransformation))
+        self.coverLabel.setPixmap(get_image(playlist.image).scaled(192, 192, transformMode=Qt.SmoothTransformation))
 
         # Font: Vision - Free Font Family
         self.nameLabel = QLabel(playlist.name)

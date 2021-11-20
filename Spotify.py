@@ -7,9 +7,8 @@ class Playlist:
     def __init__(self, playlistData: dict):
         try:
             self.image = playlistData['images'][0]['url']
-            self.image = "Pandora's Box.png"
         except IndexError:
-            self.image = "Pandora's Box.png"
+            self.image = None
         self.id = playlistData['id']
         self.name = playlistData['name']
         self.ownerName = playlistData['owner']['display_name']
@@ -19,7 +18,10 @@ class Playlist:
 class Track:
     def __init__(self, idx, trackData: dict):
         self.index: int = idx
-        self.albumCoverUri: str = ''
+        try:
+            self.albumCoverUri: str = trackData['track']['album']['images'][-1]['url']
+        except IndexError:
+            self.albumCoverUri = None
         self.title = trackData['track']['name']
         self.artists = [artist['name'] for artist in trackData['track']['artists']]
         self.album = trackData['track']['album']['name']
