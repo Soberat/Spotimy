@@ -15,7 +15,7 @@ class Playlist:
         self.id = playlistData['id']
         self.name = playlistData['name']
         self.ownerName = playlistData['owner']['display_name']
-        self.ownerPicture = "IMG_20180801_203051.jpg"
+        self.ownerPicture = playlistData['ownerPicture']
         self.snapshotId = playlistData['snapshot_id']
 
 
@@ -68,6 +68,7 @@ class Spotify:
         if self.__userPlaylistsFullDict is None:
             self.__userPlaylistsFullDict = self.sp.current_user_playlists()['items']
         for playlist in self.__userPlaylistsFullDict:
+            playlist['ownerPicture'] = self.sp.user(playlist['owner']['id'])['images'][0]['url']
             yield Playlist(playlistData=playlist)
 
     def get_playlist_tracks(self, playlist: Playlist):

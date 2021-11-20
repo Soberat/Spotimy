@@ -14,6 +14,7 @@ class PlaylistListViewWidget(QWidget):
                               'id': '',
                               'name': "No playlist!",
                               'owner': {'display_name': ''},
+                              'ownerPicture': None,
                               'snapshot_id': ''})
 
     def __init__(self):

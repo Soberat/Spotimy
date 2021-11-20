@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QFont, QImage, QBitmap
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QAbstractItemView
 
+import CachingImageGetter
 from CachingImageGetter import get_image
 from Spotify import Playlist
 from gui.PlaylistItemWidget import PlaylistItemWidget
@@ -21,14 +22,17 @@ class PlaylistViewWidget(QWidget):
         if playlist.image is not None:
             self.coverLabel.setPixmap(get_image(playlist.image).scaled(192, 192, transformMode=Qt.SmoothTransformation))
         else:
-            self.coverLabel.setPixmap(QPixmap('playlist_placeholder.png'))
+            self.coverLabel.setPixmap(QPixmap('playlist_placeholder.png').scaled(192, 192, transformMode=Qt.SmoothTransformation))
         # Font: Vision - Free Font Family
         self.nameLabel = QLabel(playlist.name)
         self.nameLabel.setFont(QFont('Gotham', 36, QFont.Black))
 
         self.ownerPictureLabel = QLabel()
         self.ownerPictureLabel.setFixedHeight(40)
-        picture = QPixmap(playlist.ownerPicture).scaled(512, 512, transformMode=Qt.SmoothTransformation)
+        if playlist.ownerPicture is not None:
+            picture = CachingImageGetter.get_image(playlist.ownerPicture).scaled(512, 512, transformMode=Qt.SmoothTransformation)
+        else:
+            picture = QPixmap('pfp_placeholder.png').scaled(512, 512)
         mask = QImage('pfp_mask.png').createAlphaMask()
         picture.setMask(QBitmap.fromImage(mask))
         self.ownerPictureLabel.setPixmap(picture.scaled(30, 30, transformMode=Qt.SmoothTransformation))
