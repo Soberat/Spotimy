@@ -6,9 +6,6 @@ from Spotify import Spotify, Playlist
 from gui.PlaylistViewWidget import PlaylistViewWidget
 
 
-# TODO: Cache playlist data
-# TODO: Download and cache playlist/track covers
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -17,6 +14,8 @@ class MainWindow(QMainWindow):
 
         self.spotify = Spotify()
         self.trackGenerator = None
+        self.playlistViews = dict()
+        self.playlistGenerators = dict()
 
         self.playlistListView = PlaylistListViewWidget()
         for playlist in self.spotify.get_user_playlists():
@@ -26,6 +25,7 @@ class MainWindow(QMainWindow):
         self.playlistView = QLabel("Empty lol")
 
         self.setCentralWidget(self.create_central_widget())
+        self.setMinimumSize(1400, 800)
 
     def create_central_widget(self):
         centralWidget = QWidget()
@@ -37,10 +37,13 @@ class MainWindow(QMainWindow):
         return centralWidget
 
     def change_playlist(self, playlist: Playlist):
-        self.centralWidgetLayout.removeWidget(self.playlistView)
-        self.playlistView = PlaylistViewWidget(playlist)
+        if playlist.name not in self.playlistViews.keys():
+            self.playlistViews[playlist.name] = (PlaylistViewWidget(playlist), self.spotify.get_playlist_tracks(playlist))
+
+        self.playlistView.setParent(None)
+        self.playlistView, self.trackGenerator = self.playlistViews[playlist.name]
+        self.playlistView.setParent(self)
         self.centralWidgetLayout.addWidget(self.playlistView, 0, 1)
-        self.trackGenerator = self.spotify.get_playlist_tracks(playlist)
 
         QTimer().singleShot(0, self.populate_playlist_view)
 
@@ -48,7 +51,6 @@ class MainWindow(QMainWindow):
         try:
             track = next(self.trackGenerator)
         except StopIteration:
-            self.trackGenerator = None
             return
         except TypeError:
             return

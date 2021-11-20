@@ -24,6 +24,7 @@ class PlaylistItemWidget(QWidget):
         else:
             self.coverLabel.setPixmap(QPixmap('track_placeholder.png').scaled(35, 35, transformMode=Qt.SmoothTransformation))
         self.titleLabel = QLabel(track.title)
+        self.titleLabel.setFixedWidth(400)
         self.titleLabel.setFont(QFont("Gotham Book", 9, QFont.Bold))
         self.artistsLabel = QLabel(', '.join(track.artists))
         self.artistsLabel.setFont(QFont("Gotham Book", 9, QFont.Normal))
