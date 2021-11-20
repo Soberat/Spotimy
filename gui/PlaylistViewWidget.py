@@ -64,12 +64,13 @@ class PlaylistViewWidget(QWidget):
         self.trackList.setStyleSheet("QListView::item:selected:!active {background-color:#346792;} QListView::item:hover:!selected {background-color:#19232d;}")
 
     def add_track(self, track):
+        self.totalRuntime += track.runtime
         item = PlaylistItemWidget(track)
         myQListWidgetItem = QListWidgetItem(self.trackList)
         myQListWidgetItem.setSizeHint(item.sizeHint())
         self.trackList.addItem(myQListWidgetItem)
         self.trackList.setItemWidget(myQListWidgetItem, item)
-        self.infoLabel.setText(f"{self.playlist.ownerName} ▴ {len(self.trackList)} tracks ▴ {self.totalRuntime}")
+        self.infoLabel.setText(f"{self.playlist.ownerName} ▴ {len(self.trackList)} tracks ▴ {int(self.totalRuntime/3600000)}h {int(self.totalRuntime/60000 - 60*int(self.totalRuntime/3600000))}m")
 
     def list_selection_changed(self):
         selectedWidgets = set([self.trackList.itemWidget(item) for item in self.trackList.selectedItems()])

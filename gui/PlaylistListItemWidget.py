@@ -19,9 +19,9 @@ class PlaylistListItemWidget(QWidget):
 
         self.imageLabel = QLabel()
         if playlist.image is not None:
-            self.imageLabel.setPixmap(get_image(playlist.image).scaled(50, 50, transformMode=Qt.SmoothTransformation))
+            self.imageLabel.setPixmap(get_image(playlist.image).scaled(60, 60, transformMode=Qt.SmoothTransformation))
         else:
-            self.imageLabel.setPixmap(QPixmap('playlist_placeholder.png').scaled(50, 50, transformMode=Qt.SmoothTransformation))
+            self.imageLabel.setPixmap(QPixmap('playlist_placeholder.png').scaled(60, 60, transformMode=Qt.SmoothTransformation))
         self.nameLabel = QLabel(playlist.name)
         self.nameLabel.setFont(QFont("ComicSans", 10, QFont.Bold))
 

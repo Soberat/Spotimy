@@ -40,7 +40,7 @@ class MainWindow(QMainWindow):
         self.centralWidgetLayout.removeWidget(self.playlistView)
         self.playlistView = PlaylistViewWidget(playlist)
         self.centralWidgetLayout.addWidget(self.playlistView, 0, 1)
-        self.trackGenerator = self.spotify.get_playlist_tracks(playlist.id)
+        self.trackGenerator = self.spotify.get_playlist_tracks(playlist)
 
         QTimer().singleShot(0, self.populate_playlist_view)
 

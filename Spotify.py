@@ -1,3 +1,6 @@
+import json
+import os
+
 import spotipy
 from spotipy import SpotifyOAuth
 from Secrets import SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI
@@ -13,6 +16,7 @@ class Playlist:
         self.name = playlistData['name']
         self.ownerName = playlistData['owner']['display_name']
         self.ownerPicture = "IMG_20180801_203051.jpg"
+        self.snapshotId = playlistData['snapshot_id']
 
 
 class Track:
@@ -66,15 +70,37 @@ class Spotify:
         for playlist in self.__userPlaylistsFullDict:
             yield Playlist(playlistData=playlist)
 
-    def get_playlist_tracks(self, playlistId: str):
-        tracks = self.sp.playlist(playlistId, fields="tracks,next")['tracks']
-        i = 0
-        for track in tracks['items']:
-            i += 1
-            yield Track(i, track)
+    def get_playlist_tracks(self, playlist: Playlist):
+        if playlist.snapshotId in os.listdir("./cache/playlists"):
+            with open(f'./cache/playlists/{playlist.snapshotId}', 'r') as snapshotFile:
+                snapshot = json.load(snapshotFile)
+                i = 0
+                for track in snapshot['tracks']:
+                    i += 1
+                    yield Track(i, track)
+        else:
+            snapshot = dict()
+            snapshot['image'] = playlist.image
+            snapshot['id'] = playlist.id
+            snapshot['name'] = playlist.name
+            snapshot['ownerName'] = playlist.ownerName
+            snapshot['ownerPicture'] = playlist.ownerPicture
+            snapshot['snapshot_id'] = playlist.snapshotId
+            snapshot['tracks'] = []
 
-        while tracks['next']:
-            tracks = self.sp.next(tracks)
+            tracks = self.sp.playlist(playlist.id, fields="tracks,next")['tracks']
+            i = 0
             for track in tracks['items']:
                 i += 1
+                snapshot['tracks'].append(track)
                 yield Track(i, track)
+
+            while tracks['next']:
+                tracks = self.sp.next(tracks)
+                for track in tracks['items']:
+                    i += 1
+                    snapshot['tracks'].append(track)
+                    yield Track(i, track)
+
+            with open(f'./cache/playlists/{playlist.snapshotId}', 'w') as snapshotFile:
+                json.dump(snapshot, snapshotFile)

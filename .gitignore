@@ -3,3 +3,4 @@
 /.cache
 /Secrets.py
 /gui/cache/*
+/gui/.cache
