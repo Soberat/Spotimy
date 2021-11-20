@@ -18,8 +18,10 @@ class PlaylistViewWidget(QWidget):
         self.mainLayout = QVBoxLayout()
 
         self.coverLabel = QLabel()
-        self.coverLabel.setPixmap(get_image(playlist.image).scaled(192, 192, transformMode=Qt.SmoothTransformation))
-
+        if playlist.image is not None:
+            self.coverLabel.setPixmap(get_image(playlist.image).scaled(192, 192, transformMode=Qt.SmoothTransformation))
+        else:
+            self.coverLabel.setPixmap(QPixmap('playlist_placeholder.png'))
         # Font: Vision - Free Font Family
         self.nameLabel = QLabel(playlist.name)
         self.nameLabel.setFont(QFont('Gotham', 36, QFont.Black))

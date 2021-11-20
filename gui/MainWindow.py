@@ -22,7 +22,7 @@ class MainWindow(QMainWindow):
             self.playlistListView.add_item(playlist)
         self.playlistListView.selectionChanged.connect(self.change_playlist)
 
-        self.playlistView = QLabel("Empty lol")
+        self.playlistView = PlaylistViewWidget(PlaylistListViewWidget.dummyPlaylist)
 
         self.setCentralWidget(self.create_central_widget())
         self.setMinimumSize(1400, 800)

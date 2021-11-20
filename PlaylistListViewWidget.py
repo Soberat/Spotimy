@@ -10,6 +10,12 @@ from gui.PlaylistListItemWidget import PlaylistListItemWidget
 class PlaylistListViewWidget(QWidget):
     selectionChanged = pyqtSignal(Playlist)
 
+    dummyPlaylist = Playlist({'images': list(),
+                              'id': '',
+                              'name': "No playlist!",
+                              'owner': {'display_name': ''},
+                              'snapshot_id': ''})
+
     def __init__(self):
         super().__init__()
         # Definitions of UI elements and their configuration
@@ -33,7 +39,15 @@ class PlaylistListViewWidget(QWidget):
         self.playlistList.setItemWidget(qListWidgetItem, item)
 
     def selection_changed(self):
-        selection = self.playlistList.itemWidget(self.playlistList.selectedItems()[0])
+        try:
+            selection = self.playlistList.itemWidget(self.playlistList.selectedItems()[0])
+        except IndexError:
+            # No item was selected
+            self.selectionChanged.emit(self.dummyPlaylist)
+            if self.previousSelection is not None:
+                self.previousSelection.deselected()
+            return
+
         if self.previousSelection is not None:
             self.previousSelection.deselected()
         selection.selected()
