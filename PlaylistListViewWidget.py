@@ -2,9 +2,9 @@ import webbrowser
 from typing import Union
 
 from PyQt5.QtCore import Qt, pyqtSignal, QPoint
-from PyQt5.QtGui import QDrag, QMouseEvent, QIcon
+from PyQt5.QtGui import QDrag, QMouseEvent, QPixmap
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QListWidget, QListWidgetItem, QAbstractItemView, QMenu, QAction, \
-     QSplitter, QPushButton
+    QSplitter, QLabel, QHBoxLayout, QFrame
 
 from Spotify import Playlist
 from gui.PlaylistListItemWidget import PlaylistListItemWidget
@@ -12,6 +12,32 @@ from gui.PlaylistListItemWidget import PlaylistListItemWidget
 
 # TODO: Add "New playlist" button
 # TODO: Add "Liked songs" 'playlist'
+
+class NewPlaylistPushButton(QFrame):
+
+    clicked = pyqtSignal()
+
+    def __init__(self, text):
+        super().__init__()
+        self.setStyleSheet("*:hover {background: gray}")
+        self.iconLabel = QLabel()
+        self.iconLabel.setPixmap(QPixmap('add_playlist.png').scaled(24, 24, transformMode=Qt.SmoothTransformation))
+
+        self.textLabel = QLabel(text)
+        font = self.textLabel.font()
+        font.setPointSize(14)
+        self.textLabel.setFont(font)
+
+        layout = QHBoxLayout()
+        layout.addWidget(self.iconLabel)
+        layout.addWidget(self.textLabel, alignment=Qt.AlignVCenter)
+
+        self.setLayout(layout)
+
+    def mousePressEvent(self, ev: QMouseEvent) -> None:
+        self.clicked.emit()
+
+
 
 
 class PlaylistListWidget(QListWidget):
@@ -80,6 +106,12 @@ class PlaylistListViewWidget(QWidget):
         self.playlistList.itemSelectionChanged.connect(self.selection_changed)
         layout = QVBoxLayout()
         self.setLayout(layout)
+
+        button = NewPlaylistPushButton("New playlist")
+        button.clicked.connect(lambda: print("New playlist not implemented!"))
+
+        layout.addWidget(button, alignment=Qt.AlignLeft)
+        layout.addWidget(QSplitter())
         layout.addWidget(self.playlistList)
 
     def add_item(self, playlist: Playlist):
