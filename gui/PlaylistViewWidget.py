@@ -4,7 +4,7 @@ from typing import Union
 from PyQt5.QtCore import Qt, QModelIndex, QPoint, pyqtSignal
 from PyQt5.QtGui import QPixmap, QFont, QImage, QBitmap, QDrag
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QAbstractItemView, \
-    QMenu, QAction
+    QMenu, QAction, QActionGroup
 
 import CachingImageGetter
 from CachingImageGetter import get_image
@@ -12,6 +12,8 @@ from Spotify import Playlist
 from gui.PlaylistItemWidget import PlaylistItemWidget
 import webbrowser
 # TODO: Color selected playlist tracks using stylesheets?
+# TODO: Add "Move to index" context menu option
+# TODO: Add "Open artist" context menu option
 
 
 class TrackListWidget(QListWidget):
@@ -23,6 +25,8 @@ class TrackListWidget(QListWidget):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.open_menu)
         self.model().rowsMoved.connect(self.update_indexes)
+        self.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.setDragDropMode(QAbstractItemView.InternalMove)
 
     def startDrag(self, supportedActions: Union[Qt.DropActions, Qt.DropAction]) -> None:
         drag = QDrag(self)
@@ -35,15 +39,33 @@ class TrackListWidget(QListWidget):
 
         moveToTop = QAction("Move to top", self)
         moveToBottom = QAction("Move to bottom", self)
-        openInSpotify = QAction("Open in Spotify", self)
-
         moveToTop.triggered.connect(self.move_to_top)
         moveToBottom.triggered.connect(self.move_to_bottom)
-        openInSpotify.triggered.connect(lambda: webbrowser.open(self.itemWidget(self.selectedItems()[-1]).track.trackUri))
 
         menu.addAction(moveToTop)
         menu.addAction(moveToBottom)
-        menu.addAction(openInSpotify)
+
+        # If a single song was selected, add more options
+        if len(self.selectedIndexes()) == 1:
+            track = self.itemWidget(self.selectedItems()[0]).track
+            menu.addSeparator()
+            openInSpotify = QAction("Open in Spotify", self)
+            openInSpotify.triggered.connect(
+                lambda: webbrowser.open(track.trackUri))
+            menu.addAction(openInSpotify)
+
+            if len(track.artists) == 1:
+                action = QAction("Open artist page")
+                action.triggered.connect(lambda: webbrowser.open(track.artistUris[0]))
+                menu.addAction(action)
+            else:
+                artistsMenu = QMenu("Open artist's page")
+                actionGroup = QActionGroup(artistsMenu)
+                for idx, artist in enumerate(self.itemWidget(self.selectedItems()[0]).track.artists):
+                    actionGroup.addAction(artistsMenu.addAction(artist)).setData(idx)
+
+                actionGroup.triggered.connect(lambda data: webbrowser.open(track.artistUris[data.data()]))
+                menu.addMenu(artistsMenu)
 
         menu.exec_(self.mapToGlobal(point))
 
@@ -114,8 +136,6 @@ class PlaylistViewWidget(QWidget):
         self.infoLabel.setFixedHeight(40)
 
         self.trackList = TrackListWidget()
-        self.trackList.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        self.trackList.setDragDropMode(QAbstractItemView.InternalMove)
 
         headerLayout = QHBoxLayout()
         headerLayout.addWidget(self.coverLabel, alignment=Qt.AlignBottom)
