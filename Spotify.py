@@ -31,6 +31,7 @@ class Track:
         self.album = trackData['track']['album']['name']
         self.added: str = trackData['added_at']
         self.runtime: int = trackData['track']['duration_ms']
+        self.trackUri = trackData['track']['uri']
 
 
 class Spotify:

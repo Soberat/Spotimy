@@ -10,7 +10,7 @@ import CachingImageGetter
 from CachingImageGetter import get_image
 from Spotify import Playlist
 from gui.PlaylistItemWidget import PlaylistItemWidget
-
+import webbrowser
 # TODO: Color selected playlist tracks using stylesheets?
 
 
@@ -35,12 +35,15 @@ class TrackListWidget(QListWidget):
 
         moveToTop = QAction("Move to top", self)
         moveToBottom = QAction("Move to bottom", self)
+        openInSpotify = QAction("Open in Spotify", self)
 
         moveToTop.triggered.connect(self.move_to_top)
         moveToBottom.triggered.connect(self.move_to_bottom)
+        openInSpotify.triggered.connect(lambda: webbrowser.open(self.itemWidget(self.selectedItems()[-1]).track.trackUri))
 
         menu.addAction(moveToTop)
         menu.addAction(moveToBottom)
+        menu.addAction(openInSpotify)
 
         menu.exec_(self.mapToGlobal(point))
 

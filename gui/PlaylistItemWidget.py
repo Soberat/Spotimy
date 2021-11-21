@@ -13,6 +13,8 @@ class PlaylistItemWidget(QWidget):
     def __init__(self, track: Track):
         super().__init__()
 
+        self.track = track
+
         self.defaultStyleSheet = self.styleSheet()
 
         self.indexLabel: QLabel = QLabel(str(track.index))
