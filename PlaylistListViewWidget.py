@@ -13,12 +13,16 @@ import resources
 # TODO: Add "New playlist" button
 # TODO: Add "Liked songs" 'playlist'
 
+
 class NewPlaylistPushButton(QFrame):
 
     clicked = pyqtSignal()
 
     def __init__(self, text):
         super().__init__()
+
+        self.defaultStyleSheet = self.styleSheet()
+
         self.setStyleSheet("*:hover {background: gray}")
         self.iconLabel = QLabel()
         self.iconLabel.setPixmap(QPixmap(':/add_playlist.png').scaled(24, 24, transformMode=Qt.SmoothTransformation))
@@ -31,8 +35,18 @@ class NewPlaylistPushButton(QFrame):
         layout = QHBoxLayout()
         layout.addWidget(self.iconLabel)
         layout.addWidget(self.textLabel, alignment=Qt.AlignVCenter)
+        layout.setStretch(1, 100)
 
         self.setLayout(layout)
+
+    def event(self, event):
+        if event.type() == QEvent.HoverEnter:
+            self.iconLabel.setStyleSheet("QLabel { background-color : gray;}")
+            self.textLabel.setStyleSheet("QLabel { background-color : gray;}")
+        elif event.type() == QEvent.HoverLeave:
+            self.iconLabel.setStyleSheet(self.defaultStyleSheet)
+            self.textLabel.setStyleSheet(self.defaultStyleSheet)
+        return super().event(event)
 
     def mousePressEvent(self, ev: QMouseEvent) -> None:
         self.clicked.emit()
@@ -84,6 +98,8 @@ class PlaylistListWidget(QListWidget):
 
 
 class PlaylistListViewWidget(QWidget):
+
+    COLUMN_WIDTH = 250
     selectionChanged = pyqtSignal(Playlist)
 
     dummyPlaylist = Playlist({'images': list(),
@@ -100,13 +116,14 @@ class PlaylistListViewWidget(QWidget):
         self.previousSelection = None
         self.playlistList = PlaylistListWidget()
 
-        self.playlistList.setMaximumWidth(250)
+        self.playlistList.setFixedWidth(self.COLUMN_WIDTH)
         self.playlistList.itemSelectionChanged.connect(self.selection_changed)
         layout = QVBoxLayout()
         self.setLayout(layout)
 
         button = NewPlaylistPushButton("New playlist")
         button.clicked.connect(lambda: print("New playlist not implemented!"))
+        button.setFixedWidth(self.COLUMN_WIDTH)
 
         layout.addWidget(button, alignment=Qt.AlignLeft)
         layout.addWidget(QSplitter())
