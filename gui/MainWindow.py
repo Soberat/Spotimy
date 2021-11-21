@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QGridLayout, QLa
 from PlaylistListViewWidget import PlaylistListViewWidget
 from Spotify import Spotify, Playlist
 from gui.PlaylistViewWidget import PlaylistViewWidget
-
+import resources
 # References:
 # https://www.flaticon.com/free-icon/playlist_565266?term=playlist&page=1&position=5&page=1&position=5&related_id=565266&origin=search
 # https://www.flaticon.com/premium-icon/musical-note_461146?term=note&page=1&position=12&page=1&position=12&related_id=461146&origin=search

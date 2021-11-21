@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QWidget, QListWidget, QListWidgetItem, 
 
 from Spotify import Playlist
 from gui.PlaylistListItemWidget import PlaylistListItemWidget
-
+import resources
 
 # TODO: Add "New playlist" button
 # TODO: Add "Liked songs" 'playlist'

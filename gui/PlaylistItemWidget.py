@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QVBoxLayout
 
 from CachingImageGetter import get_image
 from Spotify import Track
-
+import resources
 
 class PlaylistItemWidget(QWidget):
 

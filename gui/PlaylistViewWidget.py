@@ -11,7 +11,7 @@ from CachingImageGetter import get_image
 from Spotify import Playlist
 from gui.PlaylistItemWidget import PlaylistItemWidget
 import webbrowser
-
+import resources
 # TODO: Add "Move to index" context menu option
 
 
