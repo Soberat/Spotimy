@@ -6,6 +6,7 @@ from CachingImageGetter import get_image
 from Spotify import Track
 import resources
 
+
 class PlaylistItemWidget(QWidget):
 
     selectedStyleSheet = "background-color:#346792"
@@ -26,7 +27,7 @@ class PlaylistItemWidget(QWidget):
                 get_image(track.albumCoverUri).scaled(35, 35, transformMode=Qt.SmoothTransformation))
         else:
             self.coverLabel.setPixmap(
-                QPixmap('track_placeholder.png').scaled(35, 35, transformMode=Qt.SmoothTransformation))
+                QPixmap(':/track_placeholder.png').scaled(35, 35, transformMode=Qt.SmoothTransformation))
         self.titleLabel = QLabel(track.title)
         self.titleLabel.setFixedWidth(400)
         self.titleLabel.setFont(QFont("Gotham Book", 9, QFont.Bold))

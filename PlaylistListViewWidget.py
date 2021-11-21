@@ -1,7 +1,7 @@
 import webbrowser
 from typing import Union
 
-from PyQt5.QtCore import Qt, pyqtSignal, QPoint
+from PyQt5.QtCore import Qt, pyqtSignal, QPoint, QEvent
 from PyQt5.QtGui import QDrag, QMouseEvent, QPixmap
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QListWidget, QListWidgetItem, QAbstractItemView, QMenu, QAction, \
     QSplitter, QLabel, QHBoxLayout, QFrame
@@ -21,7 +21,7 @@ class NewPlaylistPushButton(QFrame):
         super().__init__()
         self.setStyleSheet("*:hover {background: gray}")
         self.iconLabel = QLabel()
-        self.iconLabel.setPixmap(QPixmap('add_playlist.png').scaled(24, 24, transformMode=Qt.SmoothTransformation))
+        self.iconLabel.setPixmap(QPixmap(':/add_playlist.png').scaled(24, 24, transformMode=Qt.SmoothTransformation))
 
         self.textLabel = QLabel(text)
         font = self.textLabel.font()
@@ -36,8 +36,6 @@ class NewPlaylistPushButton(QFrame):
 
     def mousePressEvent(self, ev: QMouseEvent) -> None:
         self.clicked.emit()
-
-
 
 
 class PlaylistListWidget(QListWidget):

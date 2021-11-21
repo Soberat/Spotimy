@@ -114,7 +114,7 @@ class PlaylistViewWidget(QWidget):
             self.coverLabel.setPixmap(get_image(playlist.image).scaled(192, 192, transformMode=Qt.SmoothTransformation))
         else:
             self.coverLabel.setPixmap(
-                QPixmap('playlist_placeholder.png').scaled(192, 192, transformMode=Qt.SmoothTransformation))
+                QPixmap(':/playlist_placeholder.png').scaled(192, 192, transformMode=Qt.SmoothTransformation))
         # Font: Vision - Free Font Family
         self.nameLabel = QLabel(playlist.name)
         self.nameLabel.setFont(QFont('Gotham', 36, QFont.Black))
@@ -125,8 +125,8 @@ class PlaylistViewWidget(QWidget):
             picture = CachingImageGetter.get_image(playlist.ownerPicture).scaled(512, 512,
                                                                                  transformMode=Qt.SmoothTransformation)
         else:
-            picture = QPixmap('pfp_placeholder.png').scaled(512, 512)
-        mask = QImage('pfp_mask.png').createAlphaMask()
+            picture = QPixmap(':/pfp_placeholder.png').scaled(512, 512)
+        mask = QImage(':/pfp_mask.png').createAlphaMask()
         picture.setMask(QBitmap.fromImage(mask))
         self.ownerPictureLabel.setPixmap(picture.scaled(30, 30, transformMode=Qt.SmoothTransformation))
 
