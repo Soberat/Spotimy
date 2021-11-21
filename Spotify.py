@@ -17,6 +17,7 @@ class Playlist:
         self.ownerName = playlistData['owner']['display_name']
         self.ownerPicture = playlistData['ownerPicture']
         self.snapshotId = playlistData['snapshot_id']
+        self.playlistUri = playlistData['uri']
 
 
 class Track:
@@ -28,6 +29,7 @@ class Track:
             self.albumCoverUri = None
         self.title = trackData['track']['name']
         self.artists = [artist['name'] for artist in trackData['track']['artists']]
+        self.artistUris = [artist['uri'] for artist in trackData['track']['artists']]
         self.album = trackData['track']['album']['name']
         self.added: str = trackData['added_at']
         self.runtime: int = trackData['track']['duration_ms']
