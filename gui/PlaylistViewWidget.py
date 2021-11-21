@@ -11,9 +11,8 @@ from CachingImageGetter import get_image
 from Spotify import Playlist
 from gui.PlaylistItemWidget import PlaylistItemWidget
 import webbrowser
-# TODO: Color selected playlist tracks using stylesheets?
+
 # TODO: Add "Move to index" context menu option
-# TODO: Add "Open artist" context menu option
 
 
 class TrackListWidget(QListWidget):

@@ -7,6 +7,7 @@ import json
 
 def get_image(uri: str):
     if not os.path.exists('./cache/.imgcache'):
+        os.makedirs('./cache/img')
         fi = open('./cache/.imgcache', 'w')
         json.dump({}, fi)
         fi.close()

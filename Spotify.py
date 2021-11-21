@@ -5,6 +5,7 @@ import spotipy
 from spotipy import SpotifyOAuth
 from Secrets import SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI
 
+# TODO: Store snapshot returned by reordering tracks
 
 class Playlist:
     def __init__(self, playlistData: dict):
@@ -75,6 +76,8 @@ class Spotify:
             yield Playlist(playlistData=playlist)
 
     def get_playlist_tracks(self, playlist: Playlist):
+        if not os.path.exists("./cache/playlists"):
+            os.makedirs("./cache/playlists")
         if playlist.snapshotId in os.listdir("./cache/playlists"):
             with open(f'./cache/playlists/{playlist.snapshotId}', 'r') as snapshotFile:
                 snapshot = json.load(snapshotFile)
