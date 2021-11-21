@@ -1,19 +1,19 @@
 import sys
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QGridLayout, QLabel
 from PlaylistListViewWidget import PlaylistListViewWidget
 from Spotify import Spotify, Playlist
+from gui.PlaybackToolbar import PlaybackToolbar
 from gui.PlaylistViewWidget import PlaylistViewWidget
 import resources
 # References:
 # https://www.flaticon.com/free-icon/playlist_565266?term=playlist&page=1&position=5&page=1&position=5&related_id=565266&origin=search
 # https://www.flaticon.com/premium-icon/musical-note_461146?term=note&page=1&position=12&page=1&position=12&related_id=461146&origin=search
 # https://www.flaticon.com/free-icon/musical-note_898945?term=note&page=1&position=69&page=1&position=69&related_id=898945&origin=search
+# https://www.flaticon.com/premium-icon/love_2901197?term=heart&page=1&position=24&page=1&position=24&related_id=2901197&origin=search
 
-# TODO: Creating cache folders
 # TODO: Clearing old playlist cache
-# TODO: Save snapshot of reordered playlist
-
+#pyrcc5 -o resources.py res/resources.qrc
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -35,6 +35,7 @@ class MainWindow(QMainWindow):
         self.playlistView = PlaylistViewWidget(PlaylistListViewWidget.dummyPlaylist)
 
         self.setCentralWidget(self.create_central_widget())
+        self.addToolBar(Qt.BottomToolBarArea, PlaybackToolbar())
         self.setMinimumSize(1400, 800)
 
     def create_central_widget(self):
