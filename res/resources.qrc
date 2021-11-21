@@ -1,0 +1,23 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource>
+        <file alias="add_playlist.png">add_playlist.png</file>
+        <file alias="pfp_mask.png">pfp_mask.png</file>
+        <file alias="pfp_placeholder.png">pfp_placeholder.png</file>
+        <file alias="playlist_liked.png">playlist_liked.png</file>
+        <file alias="playlist_placeholder.png">playlist_placeholder.png</file>
+        <file alias="slider_handle.png">slider_handle.png</file>
+        <file alias="track_placeholder.png">track_placeholder.png</file>
+        <file alias="sound_mute.png">sound_mute.png</file>
+        <file alias="sound_quiet.png">sound_quiet.png</file>
+        <file alias="sound_normal.png">sound_normal.png</file>
+        <file alias="sound_loud.png">sound_loud.png</file>
+        <file alias="maximize.png">maximize.png</file>
+        <file alias="loop.png">loop.png</file>
+        <file alias="previous.png">previous.png</file>
+        <file alias="play.png">play.png</file>
+        <file alias="pause.png">pause.png</file>
+        <file alias="next.png">next.png</file>
+        <file alias="shuffle.png">shuffle.png</file>
+    </qresource>
+</RCC>
