@@ -1,12 +1,14 @@
 import webbrowser
 from typing import Union
 
-from PyQt5.QtCore import Qt, pyqtSignal, QModelIndex, QPoint, QItemSelectionModel
-from PyQt5.QtGui import QDrag, QMouseEvent
-from PyQt5.QtWidgets import QVBoxLayout, QWidget, QListWidget, QListWidgetItem, QAbstractItemView, QMenu, QAction
+from PyQt5.QtCore import Qt, pyqtSignal, QPoint
+from PyQt5.QtGui import QDrag, QMouseEvent, QIcon
+from PyQt5.QtWidgets import QVBoxLayout, QWidget, QListWidget, QListWidgetItem, QAbstractItemView, QMenu, QAction, \
+     QSplitter, QPushButton
 
 from Spotify import Playlist
 from gui.PlaylistListItemWidget import PlaylistListItemWidget
+
 
 # TODO: Add "New playlist" button
 # TODO: Add "Liked songs" 'playlist'
@@ -21,7 +23,8 @@ class PlaylistListWidget(QListWidget):
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setDragDropMode(QAbstractItemView.InternalMove)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setStyleSheet("QListView::item:selected:!active {background-color:#346792;} QListView::item:hover:!selected {background-color:#19232d;}")
+        self.setStyleSheet(
+            "QListView::item:selected:!active {background-color:#346792;} QListView::item:hover:!selected {background-color:#19232d;}")
 
     def startDrag(self, supportedActions: Union[Qt.DropActions, Qt.DropAction]) -> None:
         drag = QDrag(self)
@@ -33,12 +36,15 @@ class PlaylistListWidget(QListWidget):
         menu = QMenu()
 
         openInSpotify = QAction("Open in Spotify", self)
-        openInSpotify.triggered.connect(
-            lambda: webbrowser.open(self.itemWidget(self.selectedItems()[0]).playlist.playlistUri))
+        openInSpotify.triggered.connect(self.open_playlist)
 
         menu.addAction(openInSpotify)
 
         menu.exec_(self.mapToGlobal(point))
+
+    def open_playlist(self):
+        if len(self.selectedItems()) != 0:
+            webbrowser.open(self.itemWidget(self.selectedItems()[0]).playlist.playlistUri)
 
     def mousePressEvent(self, e: QMouseEvent) -> None:
         if e.button() == Qt.RightButton:
@@ -51,6 +57,7 @@ class PlaylistListWidget(QListWidget):
             # self.selectionModel().select(self.indexAt(e.pos()), QItemSelectionModel.SelectionFlag.Select)
             return
         super().mouseReleaseEvent(e)
+
 
 class PlaylistListViewWidget(QWidget):
     selectionChanged = pyqtSignal(Playlist)
