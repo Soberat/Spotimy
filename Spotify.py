@@ -129,17 +129,48 @@ class Spotify:
         for deviceData in self.sp.devices()['devices']:
             yield Device(deviceData)
 
-    def play_playlist(self, context, targetUri):
-        if self.currentDevice is None:
-            devices = self.sp.devices()['devices']
-            for device in devices:
-                if device['is_active']:
-                    self.currentDevice = device
-                    continue
+    def __update_devices(self):
+        devices = self.sp.devices()['devices']
+        newDeviceList = set()
+        for deviceData in devices:
+            newDeviceList.add(Device(deviceData))
+            device = Device(deviceData)
+            if device.isActive:
+                self.currentDevice = device
 
-        if self.currentDevice is not None:
-            print(context, targetUri)
-            self.sp.start_playback(self.currentDevice['id'], context_uri=context)
+        newDeviceList = sorted(newDeviceList)
+
+        if newDeviceList != self.deviceList:
+            self.deviceList = newDeviceList
+
+    def get_active_device(self):
+        self.__update_devices()
+        return self.currentDevice
+
+    def set_shuffle(self, state: bool):
+        self.__update_devices()
+        self.sp.shuffle(state)
+
+    def previous_track(self):
+        self.__update_devices()
+        self.sp.previous_track()
+
+    def play_pause(self, play: bool):
+        if play:
+            self.sp.start_playback()
+        else:
+            self.sp.pause_playback()
+
+    def next_track(self):
+        self.__update_devices()
+        self.sp.next_track()
+
+    def next_repeat_mode(self):
+        self.sp.repeat()
+
+    def play_playlist(self, context, targetUri):
+        self.__update_devices()
+        self.sp.start_playback(context_uri=context, offset={"uri": targetUri})
 
     def reorder_playlist(self, playlistId, rangeStart, insertBefore, snapshotId=None):
         newSnapshotId = self.sp.playlist_reorder_items(playlist_id=playlistId, range_start=rangeStart, insert_before=insertBefore, snapshot_id=snapshotId)
