@@ -1,11 +1,12 @@
 import sys
 from PyQt5.QtCore import QTimer, Qt
-from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QGridLayout, QLabel
+from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QGridLayout
 from PlaylistListViewWidget import PlaylistListViewWidget
 from Spotify import Spotify, Playlist
 from gui.PlaybackToolbar import PlaybackToolbar
 from gui.PlaylistViewWidget import PlaylistViewWidget
 import resources
+
 # References:
 # https://www.flaticon.com/free-icon/playlist_565266?term=playlist&page=1&position=5&page=1&position=5&related_id=565266&origin=search
 # https://www.flaticon.com/premium-icon/musical-note_461146?term=note&page=1&position=12&page=1&position=12&related_id=461146&origin=search
@@ -13,11 +14,14 @@ import resources
 # https://www.flaticon.com/premium-icon/love_2901197?term=heart&page=1&position=24&page=1&position=24&related_id=2901197&origin=search
 
 # TODO: Clearing old playlist cache
-#pyrcc5 -o resources.py res/resources.qrc
+# pyrcc5 -o resources.py res/resources.qrc
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        self.setStyleSheet("* {background-color:#121212;} QLabel {color:#A8A8A8;} QListView::item:selected {background-color: #121212;} QListView::item:hover:!selected {background-color:#121212;} QScrollBar {border: 0px solid #121212;} QScrollBar::handle {background-color: #4d4d4d; width: 10px; border-radius: 0px} QScrollBar::up-arrow {background-color: #121212} QScrollBar::down-arrow {background-color: #121212} QScrollBar::left-arrow {background-color: #121212} QScrollBar::right-arrow {background-color: #121212} QListWidget {border: 2px solid #121212;border-radius: 4px;padding: 2px;} QSlider::sub-page:horizontal {background: #1db954; height: 40px;} QSlider::handle:horizontal {image: url(:/slider_handle.png);margin: -3px 0;} QSlider::groove:horizontal {background-color: #353535; border-radius: 2px}")
+        # self.setStyleSheet("QWidget {border: 2px dot-dash green;border-radius: 4px;padding: 2px;}")
 
         self.centralWidgetLayout = QGridLayout()
 
@@ -35,7 +39,11 @@ class MainWindow(QMainWindow):
         self.playlistView = PlaylistViewWidget(PlaylistListViewWidget.dummyPlaylist)
 
         self.setCentralWidget(self.create_central_widget())
-        self.addToolBar(Qt.BottomToolBarArea, PlaybackToolbar())
+
+        playbackToolbar = PlaybackToolbar()
+        playbackToolbar.widget.nextTrack.connect(lambda: self.spotify.sp.next_track(self.spotify.currentDevice))
+
+        self.addToolBar(Qt.BottomToolBarArea, playbackToolbar)
         self.setMinimumSize(1400, 800)
 
     def create_central_widget(self):
@@ -61,12 +69,14 @@ class MainWindow(QMainWindow):
 
         try:
             self.playlistView.trackList.orderChanged.disconnect(self.update_order)
+            self.playlistView.playTrack.disconnect(self.play_track)
         except TypeError:
             pass
         self.playlistView.setParent(None)
         self.playlistView, self.trackGenerator = self.playlistViews[playlist.name]
         self.playlistView.setParent(self)
         self.playlistView.trackList.orderChanged.connect(self.update_order)
+        self.playlistView.playTrack.connect(self.play_track)
         self.centralWidgetLayout.addWidget(self.playlistView, 0, 1)
 
         self.trackTimer = QTimer().singleShot(0, self.populate_playlist_view)
@@ -84,6 +94,9 @@ class MainWindow(QMainWindow):
 
     def update_order(self, x, y):
         self.spotify.reorder_playlist(self.playlistView.playlist.id, x, y)
+
+    def play_track(self, context, track):
+        self.spotify.play_playlist(context, track)
 
 
 app = QApplication(sys.argv)

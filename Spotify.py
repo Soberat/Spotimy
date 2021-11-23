@@ -7,6 +7,18 @@ from Secrets import SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_U
 
 # TODO: Store snapshot returned by reordering tracks
 
+
+class Device:
+    def __init__(self, deviceData):
+        self.id = deviceData['id']
+        self.isActive = deviceData['is_active']
+        self.isPrivateSession = deviceData['is_private_session']
+        self.isRestricted = deviceData['is_restricted']
+        self.name = deviceData['name']
+        self.type = deviceData['type']
+        self.volume = deviceData['volume_percent']
+
+
 class Playlist:
     def __init__(self, playlistData: dict):
         try:
@@ -61,6 +73,7 @@ class Spotify:
     def __init__(self):
         super().__init__()
         self.__userPlaylistsFullDict = None
+        self.currentDevice = None
 
         self.sp = spotipy.Spotify(
             auth_manager=SpotifyOAuth(scope=' '.join(self.scope), client_id=SPOTIPY_CLIENT_ID,
@@ -111,6 +124,22 @@ class Spotify:
 
             with open(f'./cache/playlists/{playlist.snapshotId}', 'w') as snapshotFile:
                 json.dump(snapshot, snapshotFile)
+
+    def get_devices(self):
+        for deviceData in self.sp.devices()['devices']:
+            yield Device(deviceData)
+
+    def play_playlist(self, context, targetUri):
+        if self.currentDevice is None:
+            devices = self.sp.devices()['devices']
+            for device in devices:
+                if device['is_active']:
+                    self.currentDevice = device
+                    continue
+
+        if self.currentDevice is not None:
+            print(context, targetUri)
+            self.sp.start_playback(self.currentDevice['id'], context_uri=context)
 
     def reorder_playlist(self, playlistId, rangeStart, insertBefore, snapshotId=None):
         newSnapshotId = self.sp.playlist_reorder_items(playlist_id=playlistId, range_start=rangeStart, insert_before=insertBefore, snapshot_id=snapshotId)

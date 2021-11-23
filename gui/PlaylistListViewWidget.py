@@ -4,7 +4,7 @@ from typing import Union
 from PyQt5.QtCore import Qt, pyqtSignal, QPoint, QEvent
 from PyQt5.QtGui import QDrag, QMouseEvent, QPixmap
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QListWidget, QListWidgetItem, QAbstractItemView, QMenu, QAction, \
-    QSplitter, QLabel, QHBoxLayout, QFrame
+    QSplitter, QLabel, QHBoxLayout, QFrame, QListView
 
 from Spotify import Playlist
 from gui.PlaylistListItemWidget import PlaylistListItemWidget
@@ -61,8 +61,7 @@ class PlaylistListWidget(QListWidget):
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setDragDropMode(QAbstractItemView.InternalMove)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setStyleSheet(
-            "QListView::item:selected:!active {background-color:#346792;} QListView::item:hover:!selected {background-color:#19232d;}")
+        self.setVerticalScrollMode(QListView.ScrollPerPixel)
 
     def startDrag(self, supportedActions: Union[Qt.DropActions, Qt.DropAction]) -> None:
         drag = QDrag(self)
@@ -128,6 +127,8 @@ class PlaylistListViewWidget(QWidget):
         layout.addWidget(button, alignment=Qt.AlignLeft)
         layout.addWidget(QSplitter())
         layout.addWidget(self.playlistList)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
 
     def add_item(self, playlist: Playlist):
         item = PlaylistListItemWidget(playlist)

@@ -4,11 +4,11 @@ from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel
 
 from CachingImageGetter import get_image
 from Spotify import Playlist
-import resources
+
 
 class PlaylistListItemWidget(QWidget):
 
-    selectedStyleSheet = "background-color:#346792"
+    selectedStyleSheet = "QLabel {color: #FFFFFF;font-size: 13px}"
 
     def __init__(self, playlist: Playlist):
         super().__init__()
@@ -19,9 +19,9 @@ class PlaylistListItemWidget(QWidget):
 
         self.imageLabel = QLabel()
         if playlist.image is not None:
-            self.imageLabel.setPixmap(get_image(playlist.image).scaled(60, 60, transformMode=Qt.SmoothTransformation))
+            self.imageLabel.setPixmap(get_image(playlist.image).scaled(45, 45, transformMode=Qt.SmoothTransformation))
         else:
-            self.imageLabel.setPixmap(QPixmap(':/playlist_placeholder.png').scaled(60, 60, transformMode=Qt.SmoothTransformation))
+            self.imageLabel.setPixmap(QPixmap(':/playlist_placeholder.png').scaled(45, 45, transformMode=Qt.SmoothTransformation))
         self.nameLabel = QLabel(playlist.name)
         self.nameLabel.setFont(QFont("ComicSans", 10, QFont.Bold))
 

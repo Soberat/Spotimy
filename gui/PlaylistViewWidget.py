@@ -4,14 +4,15 @@ from typing import Union
 from PyQt5.QtCore import Qt, QModelIndex, QPoint, pyqtSignal
 from PyQt5.QtGui import QPixmap, QFont, QImage, QBitmap, QDrag
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QAbstractItemView, \
-    QMenu, QAction, QActionGroup
+    QMenu, QAction, QActionGroup, QSplitter
 
 import CachingImageGetter
 from CachingImageGetter import get_image
 from Spotify import Playlist
 from gui.PlaylistItemWidget import PlaylistItemWidget
 import webbrowser
-import resources
+
+
 # TODO: Add "Move to index" context menu option
 
 
@@ -101,15 +102,21 @@ class TrackListWidget(QListWidget):
 
 
 class PlaylistViewWidget(QWidget):
+
+    playTrack = pyqtSignal(str, str)
+
     def __init__(self, playlist: Playlist):
         super().__init__()
         self.playlist = playlist
         self.totalRuntime = 0
         self.previousSelection = set()
 
+        self.setStyleSheet("QSplitter::handle {width: 10px; height: 10px; background-color: green; color: #ff00aa; border: 40px solid green; border-radius: 4px;}")
+
         self.mainLayout = QVBoxLayout()
 
         self.coverLabel = QLabel()
+        self.coverLabel.setStyleSheet("background: #282828;")
         if playlist.image is not None:
             self.coverLabel.setPixmap(get_image(playlist.image).scaled(192, 192, transformMode=Qt.SmoothTransformation))
         else:
@@ -118,6 +125,7 @@ class PlaylistViewWidget(QWidget):
         # Font: Vision - Free Font Family
         self.nameLabel = QLabel(playlist.name)
         self.nameLabel.setFont(QFont('Gotham', 36, QFont.Black))
+        self.nameLabel.setStyleSheet("QLabel {color: #FFFFFF;}")
 
         self.ownerPictureLabel = QLabel()
         self.ownerPictureLabel.setFixedHeight(40)
@@ -152,19 +160,22 @@ class PlaylistViewWidget(QWidget):
         headerLayout.setStretch(1, 10)
 
         self.mainLayout.addLayout(headerLayout)
+        self.mainLayout.addWidget(QSplitter(Qt.Horizontal))
         self.mainLayout.addWidget(self.trackList)
-        self.mainLayout.setStretch(1, 10)
+        self.mainLayout.setStretch(2, 10)
 
         self.setLayout(self.mainLayout)
         self.setMinimumSize(500, 500)
 
         self.trackList.itemSelectionChanged.connect(self.list_selection_changed)
+        # Override default stylesheet to show selected items
         self.trackList.setStyleSheet(
-            "QListView::item:selected:!active {background-color:#346792;} QListView::item:hover:!selected {background-color:#19232d;}")
+            "QListView::item:selected:active {background-color:#5A5A5A;} QListView::item:selected:!active {background-color:#5A5A5A;} QListView::item:hover:!selected {background-color:#121212;}")
 
     def add_track(self, track):
         self.totalRuntime += track.runtime
         item = PlaylistItemWidget(track)
+        item.playTrack.connect(lambda trackUri: self.playTrack.emit(self.playlist.playlistUri, trackUri))
         myQListWidgetItem = QListWidgetItem(self.trackList)
         myQListWidgetItem.setSizeHint(item.sizeHint())
         self.trackList.addItem(myQListWidgetItem)

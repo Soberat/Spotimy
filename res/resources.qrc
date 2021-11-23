@@ -19,5 +19,7 @@
         <file alias="pause.png">pause.png</file>
         <file alias="next.png">next.png</file>
         <file alias="shuffle.png">shuffle.png</file>
+        <file alias="connect.png">connect.png</file>
+        <file alias="queue.png">queue.png</file>
     </qresource>
 </RCC>

@@ -1,15 +1,16 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap, QFont
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QPixmap, QFont, QMouseEvent
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QVBoxLayout
 
 from CachingImageGetter import get_image
 from Spotify import Track
-import resources
 
 
 class PlaylistItemWidget(QWidget):
 
-    selectedStyleSheet = "background-color:#346792"
+    selectedStyleSheet = "background-color:#5A5A5A;"
+
+    playTrack = pyqtSignal(str)
 
     def __init__(self, track: Track):
         super().__init__()
@@ -31,6 +32,7 @@ class PlaylistItemWidget(QWidget):
         self.titleLabel = QLabel(track.title)
         self.titleLabel.setFixedWidth(400)
         self.titleLabel.setFont(QFont("Gotham Book", 9, QFont.Bold))
+        self.titleLabel.setStyleSheet("color: #FFFFFF;")
         self.artistsLabel = QLabel(', '.join(track.artists))
         self.artistsLabel.setFont(QFont("Gotham Book", 9, QFont.Normal))
         self.albumLabel = QLabel(track.album)
@@ -67,7 +69,7 @@ class PlaylistItemWidget(QWidget):
     def selected(self):
         self.indexLabel.setStyleSheet(self.selectedStyleSheet)
         self.coverLabel.setStyleSheet(self.selectedStyleSheet)
-        self.titleLabel.setStyleSheet(self.selectedStyleSheet)
+        self.titleLabel.setStyleSheet(self.selectedStyleSheet + "color: #FFFFFF;")
         self.artistsLabel.setStyleSheet(self.selectedStyleSheet)
         self.albumLabel.setStyleSheet(self.selectedStyleSheet)
         self.addedLabel.setStyleSheet(self.selectedStyleSheet)
@@ -76,8 +78,11 @@ class PlaylistItemWidget(QWidget):
     def deselected(self):
         self.indexLabel.setStyleSheet(self.defaultStyleSheet)
         self.coverLabel.setStyleSheet(self.defaultStyleSheet)
-        self.titleLabel.setStyleSheet(self.defaultStyleSheet)
+        self.titleLabel.setStyleSheet(self.defaultStyleSheet + "color: #FFFFFF;")
         self.artistsLabel.setStyleSheet(self.defaultStyleSheet)
         self.albumLabel.setStyleSheet(self.defaultStyleSheet)
         self.addedLabel.setStyleSheet(self.defaultStyleSheet)
         self.runtimeLabel.setStyleSheet(self.defaultStyleSheet)
+
+    def mouseDoubleClickEvent(self, a0: QMouseEvent) -> None:
+        self.playTrack.emit(self.track.trackUri)
