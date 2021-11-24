@@ -13,6 +13,7 @@ from Spotify import PlaylistTrack
 class PlaylistItemWidget(QWidget):
 
     selectedStyleSheet = "background-color:#5A5A5A;"
+    albumCoverSize = 40
 
     playTrack = pyqtSignal(str)
 
@@ -29,12 +30,11 @@ class PlaylistItemWidget(QWidget):
         self.coverLabel: QLabel = QLabel()
         if playlistTrack.track.albumCoverUri is not None:
             self.coverLabel.setPixmap(
-                get_image(playlistTrack.track.albumCoverUri).scaled(35, 35, transformMode=Qt.SmoothTransformation))
+                get_image(playlistTrack.track.albumCoverUri).scaled(self.albumCoverSize, self.albumCoverSize, transformMode=Qt.SmoothTransformation))
         else:
             self.coverLabel.setPixmap(
-                QPixmap(':/track_placeholder.png').scaled(35, 35, transformMode=Qt.SmoothTransformation))
+                QPixmap(':/track_placeholder.png').scaled(self.albumCoverSize, self.albumCoverSize, transformMode=Qt.SmoothTransformation))
         self.titleLabel = QLabel(playlistTrack.track.title)
-        self.titleLabel.setFixedWidth(400)
         self.titleLabel.setFont(QFont("Gotham Book", 9, QFont.Bold))
         self.titleLabel.setStyleSheet("color: #FFFFFF;")
         self.artistsLabel = QLabel(', '.join(playlistTrack.track.artists))
@@ -71,11 +71,14 @@ class PlaylistItemWidget(QWidget):
         mainLayout.addWidget(self.coverLabel, alignment=Qt.AlignLeft)
 
         layout = QVBoxLayout()
+        layout.addStretch(100)
         layout.addWidget(self.titleLabel)
         innerLayout = QHBoxLayout()
         # TODO: Insert status od download and sync?
         innerLayout.addWidget(self.artistsLabel)
         layout.addLayout(innerLayout)
+        layout.addStretch(100)
+
         mainLayout.addLayout(layout)
 
         mainLayout.addWidget(self.albumLabel, alignment=Qt.AlignCenter)
