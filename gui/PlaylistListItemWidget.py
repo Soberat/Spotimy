@@ -8,7 +8,7 @@ from Spotify import Playlist
 
 class PlaylistListItemWidget(QWidget):
 
-    selectedStyleSheet = "QLabel {color: #FFFFFF;font-size: 13px}"
+    selectedStyleSheet = "QLabel {color: #FFFFFF}"
 
     def __init__(self, playlist: Playlist):
         super().__init__()
