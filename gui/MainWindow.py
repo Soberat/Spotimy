@@ -28,6 +28,9 @@ class MainWindow(QMainWindow):
         self.centralWidgetLayout = QGridLayout()
 
         self.spotify = Spotify()
+        self.timer = QTimer()
+        self.timer.start(1000)
+        self.timer.timeout.connect(self.on_timeout)
         self.trackGenerator = None
         self.playlistViews = dict()
         self.playlistGenerators = dict()
@@ -61,6 +64,15 @@ class MainWindow(QMainWindow):
         self.centralWidgetLayout.addWidget(self.playlistView, 0, 1)
         self.centralWidgetLayout.setColumnStretch(1, 100)
         return centralWidget
+
+    def on_timeout(self):
+        track, device, state = self.spotify.get_current_playback()
+        if track is not None:
+            self.playbackToolbar.widget.set_track(track)
+        if device is not None:
+            self.playbackToolbar.widget.set_volume(device.volume)
+        if state is not None:
+            self.playbackToolbar.widget.set_playback_state(state)
 
     def change_playlist(self, playlist: Playlist):
         if playlist.name == PlaylistListViewWidget.dummyPlaylist.name:

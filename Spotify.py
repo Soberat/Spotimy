@@ -2,10 +2,18 @@ import json
 import os
 
 import spotipy
-from spotipy import SpotifyOAuth
+from spotipy import SpotifyOAuth, SpotifyException
 from Secrets import SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI
 
+
 # TODO: Store snapshot returned by reordering tracks
+
+class PlaybackState:
+    def __init__(self, shuffle=None, playing=None, loop=None, position=None):
+        self.shuffle = shuffle
+        self.playing = playing
+        self.loop = loop
+        self.position = position
 
 
 class Device:
@@ -84,6 +92,7 @@ class Spotify:
 
     def __init__(self):
         super().__init__()
+        self.deviceList = None
         self.__userPlaylistsFullDict = None
         self.currentDevice = None
 
@@ -139,6 +148,17 @@ class Spotify:
 
             with open(f'./cache/playlists/{playlist.snapshotId}', 'w') as snapshotFile:
                 json.dump(snapshot, snapshotFile)
+
+    def get_current_playback(self):
+        playback = self.sp.current_playback()
+        if playback is not None:
+            self.currentDevice = Device(playback['device'])
+            return Track(playback['item']), self.currentDevice, PlaybackState(shuffle=playback['shuffle_state'],
+                                                                              playing=playback['is_playing'],
+                                                                              loop=playback['repeat_state'],
+                                                                              position=playback['progress_ms'])
+        else:
+            return None, None, None
 
     def get_devices(self):
         for deviceData in self.sp.devices()['devices']:

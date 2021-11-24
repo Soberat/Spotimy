@@ -51,45 +51,60 @@ class PlaybackWidget(QWidget):
 
     shuffleChanged = pyqtSignal(bool)
     previousTrack = pyqtSignal()
-    playPause = pyqtSignal()
+    playPause = pyqtSignal(bool)
     nextTrack = pyqtSignal()
     loopChanged = pyqtSignal(bool)
     volumeChanged = pyqtSignal(int)
 
-
     iconSize = 12
+    albumCoverSize = 72
 
     def __init__(self):
         super().__init__()
 
+        self.track = None
+
         self.trackCoverLabel = QLabel()
-        self.trackCoverLabel.setPixmap(QPixmap(':/track_placeholder.png').scaled(56, 56, transformMode=Qt.SmoothTransformation))
+        self.trackCoverLabel.setPixmap(QPixmap(':/track_placeholder.png').scaled(self.albumCoverSize, self.albumCoverSize, transformMode=Qt.SmoothTransformation))
 
-        self.artistsLabel = QLabel("Magnets")
-        self.artistsLabel.setStyleSheet("color:")
-        self.titleLabel = QLabel("whoever")
+        self.titleLabel = QLabel("I Know There's Gonna Be (Good Times)")
+        self.titleLabel.setFont(QFont("Gotham Book", 9, QFont.Bold))
+        self.titleLabel.setStyleSheet("color: #FFFFFF;")
+        self.artistsLabel = QLabel("Young Thug, Jamie xx, Popcaan")
+        self.artistsLabel.setFont(QFont("Gotham Book", 7, QFont.Bold))
 
+        self.shuffleState = False
         self.shuffleButton = ToolbarButton(":/shuffle.png", self.iconSize, self.iconSize)
+        self.shuffleButton.clicked.connect(self.shuffle_pushed)
 
         self.previousButton = ToolbarButton(":/previous.png", self.iconSize, self.iconSize)
+        self.previousButton.clicked.connect(self.previousTrack.emit)
 
         self.playPauseButton = ToolbarButton(":/play.png", 32, 32)
         self.playPauseButton.clicked.connect(self.play_pause_pushed)
         self.statePlaying = False
 
         self.nextButton = ToolbarButton(":/next.png", self.iconSize, self.iconSize)
-        self.nextButton.clicked.connect(lambda: self.nextTrack.emit())
+        self.nextButton.clicked.connect(self.nextTrack.emit)
 
         self.loopButton = ToolbarButton(":/loop.png", self.iconSize, self.iconSize)
+        self.loopButton.clicked.connect(self.loopChanged.emit)
+
+        self.timeLabel = QLabel("0:00")
 
         self.trackSlider = QSlider(Qt.Horizontal)
         self.trackSlider.setFixedWidth(700)
 
+        self.runtimeLabel = QLabel("0:00")
+
         self.queueButton = ToolbarButton(":/queue.png", self.iconSize, self.iconSize)
         self.devicesButton = ToolbarButton(":/connect.png", self.iconSize, self.iconSize)
 
-        self.volumeLabel = QLabel()
-        self.volumeLabel.setPixmap(QPixmap(":/sound_mute.png").scaled(self.iconSize, self.iconSize, transformMode=Qt.SmoothTransformation))
+        self.previousVolume = 40
+
+        self.volumeButton = ToolbarButton(":/sound_mute.png", self.iconSize, self.iconSize)
+        self.volumeButton.clicked.connect(self.mute_pushed)
+
         self.volumeSlider = QSlider(Qt.Horizontal)
         self.volumeSlider.setRange(0, 100)
         self.volumeSlider.valueChanged.connect(self.change_volume)
@@ -152,7 +167,37 @@ class PlaybackWidget(QWidget):
         self.setMinimumWidth(1000)
 
     def set_track(self, track: Track):
-        pass
+        self.track = track
+        self.trackCoverLabel.setPixmap(CachingImageGetter.get_image(track.albumCoverUri).scaled(self.albumCoverSize, self.albumCoverSize, transformMode=Qt.SmoothTransformation))
+        self.titleLabel.setText(track.title)
+        self.artistsLabel.setText(", ".join(track.artists))
+        time = track.runtime / 1000
+        minutes = int(time / 60)
+        seconds = int(time - 60 * minutes)
+        self.runtimeLabel.setText(f"{minutes:02d}:{seconds:02d}")
+        self.trackSlider.setRange(0, track.runtime)
+
+        self.titleLabel.setFixedWidth(
+            self.maximizeButton.width() + self.volumeSlider.width() + self.volumeButton.width() + self.devicesButton.width() + self.queueButton.width() - self.trackCoverLabel.width())
+        self.artistsLabel.setFixedWidth(
+            self.maximizeButton.width() + self.volumeSlider.width() + self.volumeButton.width() + self.devicesButton.width() + self.queueButton.width() - self.trackCoverLabel.width())
+
+    def set_playback_state(self, playbackState: PlaybackState):
+        # set shuffle
+        # set playing
+        time = playbackState.position / 1000
+        minutes = int(time / 60)
+        seconds = int(time - 60 * minutes)
+        self.timeLabel.setText(f"{minutes:02d}:{seconds:02d}")
+        self.trackSlider.setValue(playbackState.position)
+        # set loop
+
+    def set_volume(self, value):
+        self.volumeSlider.setValue(value)
+
+    def shuffle_pushed(self):
+        self.shuffleState = not self.shuffleState
+        self.shuffleChanged.emit(self.shuffleState)
 
     def play_pause_pushed(self):
         if not self.statePlaying:
@@ -161,6 +206,14 @@ class PlaybackWidget(QWidget):
         else:
             self.playPauseButton.change_pixmap(':/play.png')
             self.statePlaying = False
+        self.playPause.emit(self.statePlaying)
+
+    def mute_pushed(self):
+        if self.volumeSlider.value() != 0:
+            self.previousVolume = self.volumeSlider.value()
+            self.volumeSlider.setValue(0)
+        else:
+            self.volumeSlider.setValue(self.previousVolume)
 
     def change_volume(self):
         value = self.volumeSlider.value()
