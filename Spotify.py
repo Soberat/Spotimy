@@ -18,6 +18,9 @@ class Device:
         self.type = deviceData['type']
         self.volume = deviceData['volume_percent']
 
+    def __cmp__(self, other):
+        return self.id > other.id
+
 
 class Playlist:
     def __init__(self, playlistData: dict):
