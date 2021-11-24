@@ -1,9 +1,12 @@
+import datetime
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QPixmap, QFont, QMouseEvent
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QVBoxLayout
 
 from CachingImageGetter import get_image
 from Spotify import Track
+
+# TODO: Animate index when track is playing, color title green
 
 
 class PlaylistItemWidget(QWidget):
@@ -37,7 +40,21 @@ class PlaylistItemWidget(QWidget):
         self.artistsLabel.setFont(QFont("Gotham Book", 9, QFont.Normal))
         self.albumLabel = QLabel(track.album)
         self.albumLabel.setFixedWidth(400)
-        self.addedLabel = QLabel(track.added)
+
+        time = datetime.datetime.strptime(track.added, "%Y-%m-%dT%H:%M:%SZ")
+        delta = datetime.datetime.now() - time
+
+        # Format date the same way Spotify does
+        if delta.days > 31:
+            self.addedLabel = QLabel(time.strftime("%d %b %Y"))
+        elif delta.days > 0:
+            self.addedLabel = QLabel(f"{delta.days} days ago")
+        elif delta.seconds/3600 > 0:
+            self.addedLabel = QLabel(f"{int(delta.seconds/3600)} hours ago")
+        elif delta.seconds/60 > 0:
+            self.addedLabel = QLabel(f"{int(delta.seconds/60)} minutes ago")
+        else:
+            self.addedLabel = QLabel(f"{delta.seconds} seconds ago")
         self.addedLabel.setFixedWidth(350)
 
         time = track.runtime / 1000
