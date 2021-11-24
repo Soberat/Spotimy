@@ -113,8 +113,6 @@ class PlaylistViewWidget(QWidget):
         self.totalRuntime = 0
         self.previousSelection = set()
 
-        self.setStyleSheet("QSplitter::handle {width: 10px; height: 10px; background-color: green; color: #ff00aa; border: 40px solid green; border-radius: 4px;}")
-
         self.mainLayout = QVBoxLayout()
 
         self.coverLabel = QLabel()
