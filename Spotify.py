@@ -168,10 +168,13 @@ class Spotify:
         self.sp.previous_track()
 
     def play_pause(self, play: bool):
-        if play:
-            self.sp.start_playback()
-        else:
-            self.sp.pause_playback()
+        try:
+            if play:
+                self.sp.start_playback()
+            else:
+                self.sp.pause_playback()
+        except SpotifyException:
+            pass
 
     def next_track(self):
         self.__update_devices()
@@ -180,9 +183,13 @@ class Spotify:
     def next_repeat_mode(self):
         self.sp.repeat()
 
+    def set_volume(self, value):
+        self.sp.volume(value)
+
     def play_track(self, context, targetUri):
         if "spotify:local" not in targetUri:
             self.sp.start_playback(context_uri=context, offset={"uri": targetUri})
 
     def reorder_playlist(self, playlistId, rangeStart, insertBefore, snapshotId=None):
-        newSnapshotId = self.sp.playlist_reorder_items(playlist_id=playlistId, range_start=rangeStart, insert_before=insertBefore, snapshot_id=snapshotId)
+        newSnapshotId = self.sp.playlist_reorder_items(playlist_id=playlistId, range_start=rangeStart,
+                                                       insert_before=insertBefore, snapshot_id=snapshotId)
