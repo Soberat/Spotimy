@@ -15,6 +15,8 @@ import resources
 
 # TODO: Clearing old playlist cache
 # TODO: When trying to play a local track, use "position" offset instead of uri
+# TODO: Implement "Add to playlist" (local tracks cannot be added via API)
+# TODO: Try to improve Slider handle
 # pyrcc5 -o resources.py res/resources.qrc
 
 
@@ -22,10 +24,29 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setStyleSheet("* {background-color:#121212;} QLabel {color:#A8A8A8;} QListView::item:selected {background-color: #121212;} QListView::item:hover:!selected {background-color:#121212;} QScrollBar {border: 0px solid #121212;} QScrollBar::handle {background-color: #4d4d4d; width: 10px; border-radius: 0px} QScrollBar::up-arrow {background-color: #121212} QScrollBar::down-arrow {background-color: #121212} QScrollBar::left-arrow {background-color: #121212} QScrollBar::right-arrow {background-color: #121212} QListWidget {border: 2px solid #121212;border-radius: 4px;padding: 2px;} QSlider::sub-page:horizontal {background: #1db954; height: 40px;} QSlider::handle:horizontal {image: url(:/slider_handle.png);margin: -3px 0;} QSlider::groove:horizontal {background-color: #353535; border-radius: 2px}")
+        self.setStyleSheet("* {background-color:#121212;}"
+                           " QLabel {color:#A8A8A8;}"
+                           " QListView::item:selected {background-color: #121212;}"
+                           " QListView::item:hover:!selected {background-color:#121212;}"
+                           " QScrollBar:vertical {background: #121212; width: 15px; margin: 0;}"
+                           " QScrollBar::add-line:vertical {height: 0px;}"
+                           " QScrollBar::sub-line:vertical {height: 0px;}"
+                           " QScrollBar::add-page:vertical {height: 0px;}"
+                           " QScrollBar::sub-page:vertical {height: 0px;}"
+                           " QScrollBar::handle {background-color: #4d4d4d; width: 15px; border-radius: 0px}"
+                           " QScrollBar::handle:!hover {border: 0px;}"
+                           " QScrollBar::handle:hover {background-color: #808080;}"
+                           " QScrollBar::handle:pressed {background-color: #B3B3B3;}"
+                           " QScrollBar {border: 0px;}"
+                           " QListWidget {border: 2px solid #121212;border-radius: 4px;padding: 2px;}"
+                           " QSlider::sub-page:horizontal {background: #1db954; height: 40px;}"
+                           " QSlider::handle:horizontal:hover {background-color: #FFFFFF; border-color: #FFFFFF; border-radius: 5px; margin: -4px 0px;}"
+                           " QSlider::handle:horizontal:!hover {background-color: #1db954; border-color: #1db954; border-radius: 2px; margin: 0px 0px;}"
+                           " QSlider::groove:horizontal {background-color: #535353; border-radius: 2px; border-color: #121212}")
         # self.setStyleSheet("QWidget {border: 2px dot-dash green;border-radius: 4px;padding: 2px;}")
 
         self.centralWidgetLayout = QGridLayout()
+        self.centralWidgetLayout.setContentsMargins(0, 0, 0, 0)
 
         self.spotify = Spotify()
         self.timer = QTimer()
@@ -55,6 +76,8 @@ class MainWindow(QMainWindow):
 
         self.addToolBar(Qt.BottomToolBarArea, self.playbackToolbar)
         self.setMinimumSize(1400, 800)
+        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().setSpacing(0)
 
     def create_central_widget(self):
         centralWidget = QWidget()

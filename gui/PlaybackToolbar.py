@@ -57,7 +57,7 @@ class PlaybackWidget(QWidget):
     volumeChanged = pyqtSignal(int)
 
     iconSize = 12
-    albumCoverSize = 72
+    albumCoverSize = 80
 
     def __init__(self):
         super().__init__()
@@ -66,6 +66,9 @@ class PlaybackWidget(QWidget):
 
         self.trackCoverLabel = QLabel()
         self.trackCoverLabel.setPixmap(QPixmap(':/track_placeholder.png').scaled(self.albumCoverSize, self.albumCoverSize, transformMode=Qt.SmoothTransformation))
+        self.trackCoverLabel.setContentsMargins(-1, -1, -1, -1)
+        self.trackCoverLabel.setMargin(0)
+        # self.trackCoverLabel.setStyleSheet("padding: 0 0 0 0; border-spacing: 0px 0px 0px 0px; margin: 0px;")
 
         self.titleLabel = QLabel("I Know There's Gonna Be (Good Times)")
         self.titleLabel.setFont(QFont("Gotham Book", 9, QFont.Bold))
@@ -115,6 +118,9 @@ class PlaybackWidget(QWidget):
 
         layout = QHBoxLayout()
 
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+
         layout.addWidget(self.trackCoverLabel)
 
         innerLayout = QVBoxLayout()
@@ -159,9 +165,6 @@ class PlaybackWidget(QWidget):
         rightCornerLayout.addWidget(self.maximizeButton)
 
         layout.addLayout(rightCornerLayout)
-
-        layout.setContentsMargins(0, 0, 0, 6)
-        layout.setSpacing(2)
 
         self.setLayout(layout)
         self.setMinimumWidth(1000)

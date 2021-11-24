@@ -10,26 +10,25 @@ from Spotify import Playlist
 from gui.PlaylistListItemWidget import PlaylistListItemWidget
 import resources
 
-# TODO: Add "New playlist" button
-# TODO: Add "Liked songs" 'playlist'
+# TODO: Implement Liked songs and new playlist buttons functionalities
 
 
-class NewPlaylistPushButton(QFrame):
+class LabeledIconButton(QFrame):
 
     clicked = pyqtSignal()
 
-    def __init__(self, text):
+    def __init__(self, text: str, pixmapPath: str):
         super().__init__()
 
         self.defaultStyleSheet = self.styleSheet()
 
-        self.setStyleSheet("*:hover {background: gray}")
         self.iconLabel = QLabel()
-        self.iconLabel.setPixmap(QPixmap(':/add_playlist.png').scaled(24, 24, transformMode=Qt.SmoothTransformation))
+        self.iconLabel.setPixmap(QPixmap(pixmapPath).scaled(24, 24, transformMode=Qt.SmoothTransformation))
 
         self.textLabel = QLabel(text)
         font = self.textLabel.font()
-        font.setPointSize(14)
+        font.setBold(True)
+        font.setPointSize(10)
         self.textLabel.setFont(font)
 
         layout = QHBoxLayout()
@@ -41,8 +40,8 @@ class NewPlaylistPushButton(QFrame):
 
     def event(self, event):
         if event.type() == QEvent.HoverEnter:
-            self.iconLabel.setStyleSheet("QLabel { background-color : gray;}")
-            self.textLabel.setStyleSheet("QLabel { background-color : gray;}")
+            self.iconLabel.setStyleSheet("QLabel {color: #FFFFFF}")
+            self.textLabel.setStyleSheet("QLabel {color: #FFFFFF}")
         elif event.type() == QEvent.HoverLeave:
             self.iconLabel.setStyleSheet(self.defaultStyleSheet)
             self.textLabel.setStyleSheet(self.defaultStyleSheet)
@@ -62,6 +61,8 @@ class PlaylistListWidget(QListWidget):
         self.setDragDropMode(QAbstractItemView.InternalMove)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollMode(QListView.ScrollPerPixel)
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setSpacing(0)
 
     def startDrag(self, supportedActions: Union[Qt.DropActions, Qt.DropAction]) -> None:
         drag = QDrag(self)
@@ -117,18 +118,28 @@ class PlaylistListViewWidget(QWidget):
 
         self.playlistList.setFixedWidth(self.COLUMN_WIDTH)
         self.playlistList.itemSelectionChanged.connect(self.selection_changed)
+
         layout = QVBoxLayout()
+        layout.setContentsMargins(5, 5, 0, 0)
+        layout.setSpacing(0)
+
         self.setLayout(layout)
 
-        button = NewPlaylistPushButton("New playlist")
+        button = LabeledIconButton("New playlist", ":/playlist_new.png")
         button.clicked.connect(lambda: print("New playlist not implemented!"))
         button.setFixedWidth(self.COLUMN_WIDTH)
-
         layout.addWidget(button, alignment=Qt.AlignLeft)
-        layout.addWidget(QSplitter())
+
+        button = LabeledIconButton("Liked songs", ":/playlist_liked.png")
+        button.clicked.connect(lambda: print("Liked songs not implemented!"))
+        button.setFixedWidth(self.COLUMN_WIDTH)
+        layout.addWidget(button, alignment=Qt.AlignLeft)
+
+        frame = QFrame()
+        frame.setStyleSheet("background-color: #282828;")
+        frame.setFrameShape(QFrame.HLine)
+        layout.addWidget(frame)
         layout.addWidget(self.playlistList)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
 
     def add_item(self, playlist: Playlist):
         item = PlaylistListItemWidget(playlist)
