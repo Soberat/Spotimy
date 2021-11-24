@@ -87,6 +87,7 @@ class MainWindow(QMainWindow):
         except StopIteration:
             return
         except TypeError:
+            self.trackTimer = QTimer().singleShot(0, self.populate_playlist_view)
             return
 
         self.playlistView.add_track(track)

@@ -118,6 +118,9 @@ class Spotify:
             while tracks['next']:
                 tracks = self.sp.next(tracks)
                 for track in tracks['items']:
+                    # Some playlist items might not have the track property
+                    if track['track'] is None:
+                        continue
                     i += 1
                     snapshot['tracks'].append(track)
                     yield Track(i, track)
