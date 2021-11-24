@@ -1,54 +1,17 @@
+import copy
 import webbrowser
 from typing import Union
-
-from PyQt5.QtCore import Qt, pyqtSignal, QPoint, QEvent
-from PyQt5.QtGui import QDrag, QMouseEvent, QPixmap
+from PyQt5.QtCore import Qt, pyqtSignal, QPoint
+from PyQt5.QtGui import QDrag, QMouseEvent
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QListWidget, QListWidgetItem, QAbstractItemView, QMenu, QAction, \
-    QSplitter, QLabel, QHBoxLayout, QFrame, QListView
+    QFrame, QListView
 
 from Spotify import Playlist
+from gui.LabeledIconButton import LabeledIconButton
 from gui.PlaylistListItemWidget import PlaylistListItemWidget
 import resources
 
-# TODO: Implement Liked songs and new playlist buttons functionalities
-
-
-class LabeledIconButton(QFrame):
-
-    clicked = pyqtSignal()
-
-    def __init__(self, text: str, pixmapPath: str):
-        super().__init__()
-
-        self.defaultStyleSheet = self.styleSheet()
-
-        self.iconLabel = QLabel()
-        self.iconLabel.setPixmap(QPixmap(pixmapPath).scaled(24, 24, transformMode=Qt.SmoothTransformation))
-
-        self.textLabel = QLabel(text)
-        font = self.textLabel.font()
-        font.setBold(True)
-        font.setPointSize(10)
-        self.textLabel.setFont(font)
-
-        layout = QHBoxLayout()
-        layout.addWidget(self.iconLabel)
-        layout.addWidget(self.textLabel, alignment=Qt.AlignVCenter)
-        layout.setStretch(1, 100)
-
-        self.setLayout(layout)
-
-    def event(self, event):
-        if event.type() == QEvent.HoverEnter:
-            self.iconLabel.setStyleSheet("QLabel {color: #FFFFFF}")
-            self.textLabel.setStyleSheet("QLabel {color: #FFFFFF}")
-        elif event.type() == QEvent.HoverLeave:
-            self.iconLabel.setStyleSheet(self.defaultStyleSheet)
-            self.textLabel.setStyleSheet(self.defaultStyleSheet)
-        return super().event(event)
-
-    def mousePressEvent(self, ev: QMouseEvent) -> None:
-        self.clicked.emit()
+# TODO: Implement new playlist buttons functionalities
 
 
 class PlaylistListWidget(QListWidget):
@@ -101,6 +64,7 @@ class PlaylistListViewWidget(QWidget):
 
     COLUMN_WIDTH = 250
     selectionChanged = pyqtSignal(Playlist)
+    openLiked = pyqtSignal(Playlist)
 
     dummyPlaylist = Playlist({'images': list(),
                               'id': '',
@@ -131,7 +95,7 @@ class PlaylistListViewWidget(QWidget):
         layout.addWidget(button, alignment=Qt.AlignLeft)
 
         button = LabeledIconButton("Liked songs", ":/playlist_liked.png")
-        button.clicked.connect(lambda: print("Liked songs not implemented!"))
+        button.clicked.connect(self.open_liked)
         button.setFixedWidth(self.COLUMN_WIDTH)
         layout.addWidget(button, alignment=Qt.AlignLeft)
 
@@ -163,3 +127,12 @@ class PlaylistListViewWidget(QWidget):
         selection.selected()
         self.previousSelection = selection
         self.selectionChanged.emit(selection.playlist)
+
+    def open_liked(self):
+        self.playlistList.itemSelectionChanged.disconnect(self.selection_changed)
+        self.playlistList.clearSelection()
+        playlist = copy.copy(self.dummyPlaylist)
+        playlist.image = ":/playlist_liked.png"
+        playlist.name = "Liked songs"
+        self.openLiked.emit(playlist)
+        self.playlistList.itemSelectionChanged.connect(self.selection_changed)

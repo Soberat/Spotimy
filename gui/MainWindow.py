@@ -17,6 +17,7 @@ import resources
 # TODO: When trying to play a local track, use "position" offset instead of uri
 # TODO: Implement "Add to playlist" (local tracks cannot be added via API)
 # TODO: Try to improve Slider handle
+
 # pyrcc5 -o resources.py res/resources.qrc
 
 
@@ -65,6 +66,7 @@ class MainWindow(QMainWindow):
         for playlist in self.spotify.get_user_playlists():
             self.playlistListView.add_item(playlist)
         self.playlistListView.selectionChanged.connect(self.change_playlist)
+        self.playlistListView.openLiked.connect(self.change_playlist)
 
         self.playlistView = PlaylistViewWidget(PlaylistListViewWidget.dummyPlaylist)
 
@@ -110,6 +112,12 @@ class MainWindow(QMainWindow):
             self.playlistView.setParent(self)
             self.centralWidgetLayout.addWidget(self.playlistView, 0, 1)
             return
+
+        if playlist.name == "Liked songs":
+            playlist.ownerName = self.spotify.get_current_user().name
+            playlist.ownerPicture = self.spotify.get_current_user().image
+            self.playlistViews[playlist.name] = (PlaylistViewWidget(playlist), self.spotify.get_saved_tracks())
+
         if playlist.name not in self.playlistViews.keys():
             self.playlistViews[playlist.name] = (PlaylistViewWidget(playlist), self.spotify.get_playlist_tracks(playlist))
 

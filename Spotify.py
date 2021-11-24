@@ -16,6 +16,16 @@ class PlaybackState:
         self.position = position
 
 
+class User:
+    def __init__(self, userData):
+        self.name = userData['display_name']
+        try:
+            self.image = userData['images'][0]['url']
+        except IndexError:
+            self.image = None
+        self.uri = userData['uri']
+
+
 class Device:
     def __init__(self, deviceData):
         self.id = deviceData['id']
@@ -109,6 +119,23 @@ class Spotify:
             playlist['ownerPicture'] = self.sp.user(playlist['owner']['id'])['images'][0]['url']
             yield Playlist(playlistData=playlist)
 
+    def get_saved_tracks(self):
+        # Saved tracks are not cached, since they don't have a snapshot ID
+        liked = self.sp.current_user_saved_tracks()
+
+        i = 0
+        # We have enough information to <just> not require a new class just for liked tracks
+        for track in liked['items']:
+            i += 1
+            track['is_local'] = False  # You can't like local tracks
+            yield PlaylistTrack(track, i)
+
+        while liked['next']:
+            for track in liked['items']:
+                i += 1
+                track['is_local'] = False  # You can't like local tracks
+                yield PlaylistTrack(track, i)
+
     def get_playlist_tracks(self, playlist: Playlist):
         if not os.path.exists("./cache/playlists"):
             os.makedirs("./cache/playlists")
@@ -182,6 +209,10 @@ class Spotify:
         self.__update_devices()
         return self.currentDevice
 
+    # Todo cache
+    def get_current_user(self):
+        return User(self.sp.current_user())
+
     def set_shuffle(self, state: bool):
         self.__update_devices()
         self.sp.shuffle(state)
@@ -211,7 +242,10 @@ class Spotify:
 
     def play_track(self, context, targetUri):
         if "spotify:local" not in targetUri:
-            self.sp.start_playback(context_uri=context, offset={"uri": targetUri})
+            if context == '':
+                self.sp.start_playback(uris=[targetUri])
+            else:
+                self.sp.start_playback(context_uri=context, offset={"uri": targetUri})
 
     def reorder_playlist(self, playlistId, rangeStart, insertBefore, snapshotId=None):
         newSnapshotId = self.sp.playlist_reorder_items(playlist_id=playlistId, range_start=rangeStart,
