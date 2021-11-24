@@ -14,7 +14,9 @@ import resources
 # https://www.flaticon.com/premium-icon/love_2901197?term=heart&page=1&position=24&page=1&position=24&related_id=2901197&origin=search
 
 # TODO: Clearing old playlist cache
+# TODO: When trying to play a local track, use "position" offset instead of uri
 # pyrcc5 -o resources.py res/resources.qrc
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -97,7 +99,7 @@ class MainWindow(QMainWindow):
         self.spotify.reorder_playlist(self.playlistView.playlist.id, x, y)
 
     def play_track(self, context, track):
-        self.spotify.play_playlist(context, track)
+        self.spotify.play_track(context, track)
 
 
 app = QApplication(sys.argv)

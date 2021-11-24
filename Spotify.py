@@ -171,9 +171,9 @@ class Spotify:
     def next_repeat_mode(self):
         self.sp.repeat()
 
-    def play_playlist(self, context, targetUri):
-        self.__update_devices()
-        self.sp.start_playback(context_uri=context, offset={"uri": targetUri})
+    def play_track(self, context, targetUri):
+        if "spotify:local" not in targetUri:
+            self.sp.start_playback(context_uri=context, offset={"uri": targetUri})
 
     def reorder_playlist(self, playlistId, rangeStart, insertBefore, snapshotId=None):
         newSnapshotId = self.sp.playlist_reorder_items(playlist_id=playlistId, range_start=rangeStart, insert_before=insertBefore, snapshot_id=snapshotId)
