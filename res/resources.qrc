@@ -1,7 +1,7 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
     <qresource>
-        <file alias="add_playlist.png">add_playlist.png</file>
+        <file alias="playlist_new.png">playlist_new.png</file>
         <file alias="pfp_mask.png">pfp_mask.png</file>
         <file alias="pfp_placeholder.png">pfp_placeholder.png</file>
         <file alias="playlist_liked.png">playlist_liked.png</file>
