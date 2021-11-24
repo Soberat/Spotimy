@@ -1,7 +1,17 @@
 from PyQt5.QtCore import Qt, pyqtSignal, QEvent
-from PyQt5.QtGui import QPixmap, QIcon, QMouseEvent
+from PyQt5.QtGui import QPixmap, QIcon, QMouseEvent, QFont
 from PyQt5.QtWidgets import QToolBar, QHBoxLayout, QPushButton, QWidget, QLabel, QVBoxLayout, QSlider
-from Spotify import Track
+
+import CachingImageGetter
+from Spotify import Track, PlaybackState
+
+
+# TODO: Color buttons when hovered
+# TODO: Color buttons based on state
+# TODO: Resize play/pause button on hover
+# TODO: Add functions to control states
+# TODO: Change runtime to remaining time on click
+# TODO: Disable external setting volume when volume handle is grabbed
 
 
 class ToolbarButton(QWidget):
