@@ -114,9 +114,9 @@ class PlaybackWidget(QWidget):
         sliderLayout = QHBoxLayout()
 
         sliderLayout.addStretch(1000)
-        sliderLayout.addWidget(QLabel("0:00"))
+        sliderLayout.addWidget(self.timeLabel)
         sliderLayout.addWidget(self.trackSlider)
-        sliderLayout.addWidget(QLabel("0:00"))
+        sliderLayout.addWidget(self.runtimeLabel)
         sliderLayout.addStretch(1000)
 
         controlLayout.addLayout(innerControlLayout)
@@ -125,11 +125,15 @@ class PlaybackWidget(QWidget):
         layout.addLayout(controlLayout)
         layout.setStretch(2, 100)
 
-        layout.addWidget(self.queueButton)
-        layout.addWidget(self.devicesButton)
-        layout.addWidget(self.volumeLabel)
-        layout.addWidget(self.volumeSlider)
-        layout.addWidget(self.maximizeButton)
+        rightCornerLayout = QHBoxLayout()
+
+        rightCornerLayout.addWidget(self.queueButton)
+        rightCornerLayout.addWidget(self.devicesButton)
+        rightCornerLayout.addWidget(self.volumeButton)
+        rightCornerLayout.addWidget(self.volumeSlider)
+        rightCornerLayout.addWidget(self.maximizeButton)
+
+        layout.addLayout(rightCornerLayout)
 
         layout.setContentsMargins(0, 0, 0, 6)
         layout.setSpacing(2)
@@ -151,13 +155,13 @@ class PlaybackWidget(QWidget):
     def change_volume(self):
         value = self.volumeSlider.value()
         if value == 0:
-            self.volumeLabel.setPixmap(QPixmap(":/sound_mute.png").scaled(self.iconSize, self.iconSize, transformMode=Qt.SmoothTransformation))
+            self.volumeButton.change_pixmap(":/sound_mute.png")
         elif value <= 30:
-            self.volumeLabel.setPixmap(QPixmap(":/sound_quiet.png").scaled(self.iconSize, self.iconSize, transformMode=Qt.SmoothTransformation))
+            self.volumeButton.change_pixmap(":/sound_quiet.png")
         elif value <= 70:
-            self.volumeLabel.setPixmap(QPixmap(":/sound_normal.png").scaled(self.iconSize, self.iconSize, transformMode=Qt.SmoothTransformation))
+            self.volumeButton.change_pixmap(":/sound_normal.png")
         else:
-            self.volumeLabel.setPixmap(QPixmap(":/sound_loud.png").scaled(self.iconSize, self.iconSize, transformMode=Qt.SmoothTransformation))
+            self.volumeButton.change_pixmap(":/sound_loud.png")
 
         self.volumeChanged.emit(value)
 
