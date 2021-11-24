@@ -34,19 +34,28 @@ class Playlist:
 
 
 class Track:
-    def __init__(self, idx, trackData: dict):
-        self.index: int = idx
+    def __init__(self, trackData: dict):
         try:
-            self.albumCoverUri: str = trackData['track']['album']['images'][-1]['url']
+            self.albumCoverUri: str = trackData['album']['images'][-1]['url']
         except IndexError:
             self.albumCoverUri = None
-        self.title = trackData['track']['name']
-        self.artists = [artist['name'] for artist in trackData['track']['artists']]
-        self.artistUris = [artist['uri'] for artist in trackData['track']['artists']]
-        self.album = trackData['track']['album']['name']
-        self.added: str = trackData['added_at']
-        self.runtime: int = trackData['track']['duration_ms']
-        self.trackUri = trackData['track']['uri']
+        self.title = trackData['name']
+        self.artists = [artist['name'] for artist in trackData['artists']]
+        self.artistUris = [artist['uri'] for artist in trackData['artists']]
+        self.album = trackData['album']['name']
+        self.runtime: int = trackData['duration_ms']
+        self.trackUri = trackData['uri']
+
+
+class PlaylistTrack:
+    def __init__(self, playlistTrackData, index):
+        self.index = index
+        self.addedAt = playlistTrackData['added_at']
+        # self.addedBy = playlistTrackData['added_by']
+        self.isLocal = playlistTrackData['is_local']
+        # self.primaryColor = playlistTrackData['primary_color']
+        # self.videoThumbnail = playlistTrackData['video_thumbnail']
+        self.track = Track(playlistTrackData['track'])
 
 
 class Spotify:
@@ -97,7 +106,7 @@ class Spotify:
                 i = 0
                 for track in snapshot['tracks']:
                     i += 1
-                    yield Track(i, track)
+                    yield PlaylistTrack(track, i)
         else:
             snapshot = dict()
             snapshot['image'] = playlist.image
@@ -113,7 +122,7 @@ class Spotify:
             for track in tracks['items']:
                 i += 1
                 snapshot['tracks'].append(track)
-                yield Track(i, track)
+                yield PlaylistTrack(track, i)
 
             while tracks['next']:
                 tracks = self.sp.next(tracks)
@@ -123,7 +132,7 @@ class Spotify:
                         continue
                     i += 1
                     snapshot['tracks'].append(track)
-                    yield Track(i, track)
+                    yield PlaylistTrack(track, i)
 
             with open(f'./cache/playlists/{playlist.snapshotId}', 'w') as snapshotFile:
                 json.dump(snapshot, snapshotFile)

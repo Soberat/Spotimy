@@ -4,7 +4,8 @@ from PyQt5.QtGui import QPixmap, QFont, QMouseEvent
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QVBoxLayout
 
 from CachingImageGetter import get_image
-from Spotify import Track
+from Spotify import PlaylistTrack
+
 
 # TODO: Animate index when track is playing, color title green
 
@@ -15,33 +16,33 @@ class PlaylistItemWidget(QWidget):
 
     playTrack = pyqtSignal(str)
 
-    def __init__(self, track: Track):
+    def __init__(self, playlistTrack: PlaylistTrack):
         super().__init__()
 
-        self.track = track
+        self.playlistTrack = playlistTrack
 
         self.defaultStyleSheet = self.styleSheet()
 
-        self.indexLabel: QLabel = QLabel(str(track.index))
+        self.indexLabel: QLabel = QLabel(str(playlistTrack.index))
         self.indexLabel.setFixedWidth(25)
         self.indexLabel.setAlignment(Qt.AlignCenter)
         self.coverLabel: QLabel = QLabel()
-        if track.albumCoverUri is not None:
+        if playlistTrack.track.albumCoverUri is not None:
             self.coverLabel.setPixmap(
-                get_image(track.albumCoverUri).scaled(35, 35, transformMode=Qt.SmoothTransformation))
+                get_image(playlistTrack.track.albumCoverUri).scaled(35, 35, transformMode=Qt.SmoothTransformation))
         else:
             self.coverLabel.setPixmap(
                 QPixmap(':/track_placeholder.png').scaled(35, 35, transformMode=Qt.SmoothTransformation))
-        self.titleLabel = QLabel(track.title)
+        self.titleLabel = QLabel(playlistTrack.track.title)
         self.titleLabel.setFixedWidth(400)
         self.titleLabel.setFont(QFont("Gotham Book", 9, QFont.Bold))
         self.titleLabel.setStyleSheet("color: #FFFFFF;")
-        self.artistsLabel = QLabel(', '.join(track.artists))
+        self.artistsLabel = QLabel(', '.join(playlistTrack.track.artists))
         self.artistsLabel.setFont(QFont("Gotham Book", 9, QFont.Normal))
-        self.albumLabel = QLabel(track.album)
+        self.albumLabel = QLabel(playlistTrack.track.album)
         self.albumLabel.setFixedWidth(400)
 
-        time = datetime.datetime.strptime(track.added, "%Y-%m-%dT%H:%M:%SZ")
+        time = datetime.datetime.strptime(playlistTrack.addedAt, "%Y-%m-%dT%H:%M:%SZ")
         delta = datetime.datetime.now() - time
 
         # Format date the same way Spotify does
@@ -57,7 +58,7 @@ class PlaylistItemWidget(QWidget):
             self.addedLabel = QLabel(f"{delta.seconds} seconds ago")
         self.addedLabel.setFixedWidth(350)
 
-        time = track.runtime / 1000
+        time = playlistTrack.track.runtime / 1000
         minutes = int(time / 60)
         seconds = int(time - 60 * minutes)
         self.runtimeLabel = QLabel(f"{minutes:02d}:{seconds:02d}")
@@ -102,4 +103,4 @@ class PlaylistItemWidget(QWidget):
         self.runtimeLabel.setStyleSheet(self.defaultStyleSheet)
 
     def mouseDoubleClickEvent(self, a0: QMouseEvent) -> None:
-        self.playTrack.emit(self.track.trackUri)
+        self.playTrack.emit(self.playlistTrack.track.trackUri)

@@ -172,9 +172,9 @@ class PlaylistViewWidget(QWidget):
         self.trackList.setStyleSheet(
             "QListView::item:selected:active {background-color:#5A5A5A;} QListView::item:selected:!active {background-color:#5A5A5A;} QListView::item:hover:!selected {background-color:#121212;}")
 
-    def add_track(self, track):
-        self.totalRuntime += track.runtime
-        item = PlaylistItemWidget(track)
+    def add_track(self, playlistTrack):
+        self.totalRuntime += playlistTrack.track.runtime
+        item = PlaylistItemWidget(playlistTrack)
         item.playTrack.connect(lambda trackUri: self.playTrack.emit(self.playlist.playlistUri, trackUri))
         myQListWidgetItem = QListWidgetItem(self.trackList)
         myQListWidgetItem.setSizeHint(item.sizeHint())
