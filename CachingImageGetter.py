@@ -8,6 +8,10 @@ import json
 # TODO: Sometimes the passed uri is none - should be investigated
 
 def get_image(uri: str):
+
+    if uri.startswith(":/"):
+        return QPixmap(uri)
+
     if not os.path.exists('./cache/.imgcache'):
         os.makedirs('./cache/img')
         fi = open('./cache/.imgcache', 'w')
