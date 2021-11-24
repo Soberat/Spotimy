@@ -187,7 +187,14 @@ class PlaybackWidget(QWidget):
 
     def set_playback_state(self, playbackState: PlaybackState):
         # set shuffle
-        # set playing
+
+        # Set playing status
+        if playbackState.playing:
+            self.playPauseButton.change_pixmap(":/pause.png")
+        else:
+            self.playPauseButton.change_pixmap(":/play.png")
+
+        # Set timing info
         time = playbackState.position / 1000
         minutes = int(time / 60)
         seconds = int(time - 60 * minutes)
