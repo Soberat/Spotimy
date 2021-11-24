@@ -5,6 +5,8 @@ from PyQt5.QtGui import QPixmap
 import json
 
 
+# TODO: Sometimes the passed uri is none - should be investigated
+
 def get_image(uri: str):
     if not os.path.exists('./cache/.imgcache'):
         os.makedirs('./cache/img')

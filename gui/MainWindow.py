@@ -42,10 +42,15 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.create_central_widget())
 
-        playbackToolbar = PlaybackToolbar()
-        playbackToolbar.widget.nextTrack.connect(lambda: self.spotify.sp.next_track(self.spotify.currentDevice))
+        self.playbackToolbar = PlaybackToolbar()
+        self.playbackToolbar.widget.shuffleChanged.connect(self.spotify.sp.shuffle)
+        self.playbackToolbar.widget.previousTrack.connect(self.spotify.previous_track)
+        self.playbackToolbar.widget.playPause.connect(self.spotify.play_pause)
+        self.playbackToolbar.widget.nextTrack.connect(self.spotify.next_track)
+        # self.playbackToolbar.widget.loopChanged.connect(self.spotify.sp.repeat())
+        self.playbackToolbar.widget.volumeChanged.connect(self.spotify.set_volume)
 
-        self.addToolBar(Qt.BottomToolBarArea, playbackToolbar)
+        self.addToolBar(Qt.BottomToolBarArea, self.playbackToolbar)
         self.setMinimumSize(1400, 800)
 
     def create_central_widget(self):
