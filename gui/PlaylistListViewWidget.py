@@ -106,11 +106,11 @@ class PlaylistListViewWidget(QWidget):
         layout.addWidget(self.playlistList)
 
     def add_item(self, playlist: Playlist):
-        item = PlaylistListItemWidget(playlist)
+        itemWidget = PlaylistListItemWidget(playlist)
         qListWidgetItem = QListWidgetItem(self.playlistList)
-        qListWidgetItem.setSizeHint(item.sizeHint())
+        qListWidgetItem.setSizeHint(itemWidget.sizeHint())
         self.playlistList.addItem(qListWidgetItem)
-        self.playlistList.setItemWidget(qListWidgetItem, item)
+        self.playlistList.setItemWidget(qListWidgetItem, itemWidget)
 
     def selection_changed(self):
         try:
