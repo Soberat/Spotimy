@@ -35,9 +35,7 @@ class PlaylistListItemWidget(QWidget):
         self.setFixedWidth(250)
 
     def selected(self):
-        self.imageLabel.setStyleSheet(self.selectedStyleSheet)
         self.nameLabel.setStyleSheet(self.selectedStyleSheet)
 
     def deselected(self):
-        self.imageLabel.setStyleSheet(self.defaultStyleSheet)
         self.nameLabel.setStyleSheet(self.defaultStyleSheet)
