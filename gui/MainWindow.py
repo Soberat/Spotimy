@@ -17,6 +17,8 @@ import resources
 # TODO: When trying to play a local track, use "position" offset instead of uri
 # TODO: Implement "Add to playlist" (local tracks cannot be added via API)
 # TODO: Try to improve Slider handle
+# TODO: Modify track stylesheet if is playing and is in context
+
 
 # pyrcc5 -o resources.py res/resources.qrc
 
@@ -94,15 +96,6 @@ class MainWindow(QMainWindow):
         self.centralWidgetLayout.addWidget(self.playlistView, 0, 1)
         self.centralWidgetLayout.setColumnStretch(1, 100)
         return centralWidget
-
-    def on_timeout(self):
-        track, device, state = self.spotify.get_current_playback()
-        if track is not None:
-            self.playbackToolbar.widget.set_track(track)
-        if device is not None:
-            self.playbackToolbar.widget.set_volume(device.volume)
-        if state is not None:
-            self.playbackToolbar.widget.set_playback_state(state)
 
     def change_playlist(self, playlist: Playlist):
         if playlist.name == PlaylistListViewWidget.dummyPlaylist.name:
