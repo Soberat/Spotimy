@@ -1,7 +1,9 @@
 import json
 import os
+import time
 
 import spotipy
+from PyQt5.QtCore import QObject, pyqtSignal, QRunnable
 from spotipy import SpotifyOAuth, SpotifyException
 from Secrets import SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI
 
@@ -111,6 +113,7 @@ class Spotify:
                                       client_secret=SPOTIPY_CLIENT_SECRET,
                                       redirect_uri=SPOTIPY_REDIRECT_URI))
 
+    # TODO: Cache
     def get_user_playlists(self):
         # Use cached result if possible
         if self.__userPlaylistsFullDict is None:
@@ -250,3 +253,19 @@ class Spotify:
     def reorder_playlist(self, playlistId, rangeStart, insertBefore, snapshotId=None):
         newSnapshotId = self.sp.playlist_reorder_items(playlist_id=playlistId, range_start=rangeStart,
                                                        insert_before=insertBefore, snapshot_id=snapshotId)
+
+
+class WorkerSignals(QObject):
+    stateReady = pyqtSignal(tuple)
+
+
+class Worker(QRunnable, QObject):
+    def __init__(self, spotify: Spotify):
+        super().__init__()
+        self.spotify = spotify
+        self.signals = WorkerSignals()
+
+    def run(self):
+        while True:
+            self.signals.stateReady.emit(self.spotify.get_current_playback())
+            time.sleep(1)

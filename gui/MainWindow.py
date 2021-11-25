@@ -1,8 +1,8 @@
 import sys
-from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtCore import QTimer, Qt, QThreadPool
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QGridLayout
 from PlaylistListViewWidget import PlaylistListViewWidget
-from Spotify import Spotify, Playlist
+from Spotify import Spotify, Playlist, Worker
 from gui.PlaybackToolbar import PlaybackToolbar
 from gui.PlaylistViewWidget import PlaylistViewWidget
 import resources
@@ -54,9 +54,10 @@ class MainWindow(QMainWindow):
         self.centralWidgetLayout.setContentsMargins(0, 0, 0, 0)
 
         self.spotify = Spotify()
-        self.timer = QTimer()
-        self.timer.start(1000)
-        self.timer.timeout.connect(self.on_timeout)
+        self.stateWorker = Worker(self.spotify)
+        self.threadPool = QThreadPool.globalInstance()
+        self.threadPool.start(self.stateWorker)
+        self.stateWorker.signals.stateReady.connect(self.set_playback_state)
         self.trackGenerator = None
         self.playlistViews = dict()
         self.playlistGenerators = dict()
@@ -152,6 +153,11 @@ class MainWindow(QMainWindow):
 
     def play_track(self, context, track):
         self.spotify.play_track(context, track)
+
+    def set_playback_state(self, states: tuple):
+        self.playbackToolbar.widget.set_track(states[0])
+        self.playbackToolbar.widget.set_volume(states[1].volume)
+        self.playbackToolbar.widget.set_playback_state(states[2])
 
 
 app = QApplication(sys.argv)
