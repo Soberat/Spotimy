@@ -87,12 +87,9 @@ class PlaylistViewWidget(QWidget):
 
     def add_track(self, playlistTrack):
         self.totalRuntime += playlistTrack.track.runtime
-        item = PlaylistItemWidget(playlistTrack)
-        item.playTrack.connect(lambda trackUri: self.playTrack.emit(self.playlist.playlistUri, trackUri))
-        myQListWidgetItem = QListWidgetItem(self.trackList)
-        myQListWidgetItem.setSizeHint(item.sizeHint())
-        self.trackList.addItem(myQListWidgetItem)
-        self.trackList.setItemWidget(myQListWidgetItem, item)
+        itemWidget = PlaylistItemWidget(playlistTrack)
+        itemWidget.playTrack.connect(lambda trackUri: self.playTrack.emit(self.playlist.playlistUri, trackUri))
+        self.trackList.add_widget(itemWidget)
         self.infoLabel.setText(
             f"{self.playlist.ownerName} ▴ {len(self.trackList)} tracks ▴ {int(self.totalRuntime / 3600000)}h {int(self.totalRuntime / 60000 - 60 * int(self.totalRuntime / 3600000))}m")
 

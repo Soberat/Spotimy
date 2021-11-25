@@ -3,7 +3,7 @@ from typing import Union
 
 from PyQt5.QtCore import pyqtSignal, Qt, QPoint, QModelIndex
 from PyQt5.QtGui import QDrag
-from PyQt5.QtWidgets import QListWidget, QAbstractItemView, QMenu, QAction, QActionGroup
+from PyQt5.QtWidgets import QListWidget, QAbstractItemView, QMenu, QAction, QActionGroup, QListWidgetItem
 
 
 class TrackListWidget(QListWidget):
@@ -89,3 +89,9 @@ class TrackListWidget(QListWidget):
         for idx, widget in enumerate(widgets):
             widget.indexLabel.setText(str(idx + 1))
         self.scrollToTop()
+
+    def add_widget(self, itemWidget):
+        myQListWidgetItem = QListWidgetItem(self)
+        myQListWidgetItem.setSizeHint(itemWidget.sizeHint())
+        self.addItem(myQListWidgetItem)
+        self.setItemWidget(myQListWidgetItem, itemWidget)
