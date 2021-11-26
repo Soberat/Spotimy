@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QEvent
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel
 
@@ -14,7 +14,7 @@ class PlaylistListItemWidget(QWidget):
         super().__init__()
 
         self.defaultStyleSheet = self.styleSheet()
-
+        self.isSelected = False
         self.playlist = playlist
 
         self.imageLabel = QLabel()
@@ -34,8 +34,18 @@ class PlaylistListItemWidget(QWidget):
 
         self.setFixedWidth(250)
 
+    def event(self, event):
+        if not self.isSelected:
+            if event.type() == QEvent.HoverEnter:
+                self.nameLabel.setStyleSheet("QLabel {color: #FFFFFF}")
+            elif event.type() == QEvent.HoverLeave:
+                self.nameLabel.setStyleSheet(self.defaultStyleSheet)
+        return super().event(event)
+
     def selected(self):
+        self.isSelected = True
         self.nameLabel.setStyleSheet(self.selectedStyleSheet)
 
     def deselected(self):
+        self.isSelected = False
         self.nameLabel.setStyleSheet(self.defaultStyleSheet)
