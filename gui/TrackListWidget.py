@@ -37,7 +37,7 @@ class TrackListWidget(QListWidget):
 
         # If a single song was selected, add more options
         if len(self.selectedIndexes()) == 1:
-            track = self.itemWidget(self.selectedItems()[0]).track
+            track = self.itemWidget(self.selectedItems()[0]).playlistTrack.track
             menu.addSeparator()
             openInSpotify = QAction("Open in Spotify", self)
             openInSpotify.triggered.connect(
@@ -51,7 +51,7 @@ class TrackListWidget(QListWidget):
             else:
                 artistsMenu = QMenu("Open artist's page")
                 actionGroup = QActionGroup(artistsMenu)
-                for idx, artist in enumerate(self.itemWidget(self.selectedItems()[0]).track.artists):
+                for idx, artist in enumerate(track.artists):
                     actionGroup.addAction(artistsMenu.addAction(artist)).setData(idx)
 
                 actionGroup.triggered.connect(lambda data: webbrowser.open(track.artistUris[data.data()]))
