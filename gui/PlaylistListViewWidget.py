@@ -89,15 +89,15 @@ class PlaylistListViewWidget(QWidget):
 
         self.setLayout(layout)
 
-        button = LabeledIconButton("New playlist", ":/playlist_new.png")
-        button.clicked.connect(lambda: print("New playlist not implemented!"))
-        button.setFixedWidth(self.COLUMN_WIDTH)
-        layout.addWidget(button, alignment=Qt.AlignLeft)
+        self.newPlaylistButton = LabeledIconButton("New playlist", ":/playlist_new.png")
+        self.newPlaylistButton.clicked.connect(lambda: print("New playlist not implemented!"))
+        self.newPlaylistButton.setFixedWidth(self.COLUMN_WIDTH)
+        layout.addWidget(self.newPlaylistButton, alignment=Qt.AlignLeft)
 
-        button = LabeledIconButton("Liked songs", ":/playlist_liked.png")
-        button.clicked.connect(self.open_liked)
-        button.setFixedWidth(self.COLUMN_WIDTH)
-        layout.addWidget(button, alignment=Qt.AlignLeft)
+        self.likedSongsButton = LabeledIconButton("Liked songs", ":/playlist_liked.png")
+        self.likedSongsButton.clicked.connect(self.open_liked)
+        self.likedSongsButton.setFixedWidth(self.COLUMN_WIDTH)
+        layout.addWidget(self.likedSongsButton, alignment=Qt.AlignLeft)
 
         frame = QFrame()
         frame.setStyleSheet("background-color: #282828;")
@@ -130,7 +130,8 @@ class PlaylistListViewWidget(QWidget):
 
     def open_liked(self):
         self.playlistList.itemSelectionChanged.disconnect(self.selection_changed)
-        self.playlistList.clearSelection()
+        if self.previousSelection is not None:
+            self.previousSelection.deselected()
         playlist = copy.copy(self.dummyPlaylist)
         playlist.image = ":/playlist_liked.png"
         playlist.name = "Liked songs"

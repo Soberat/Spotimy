@@ -6,10 +6,14 @@ from PyQt5.QtWidgets import QFrame, QLabel, QHBoxLayout
 class LabeledIconButton(QFrame):
     clicked = pyqtSignal()
 
+    selectedStyleSheet = "QLabel {color: #FFFFFF}"
+
     def __init__(self, text: str, pixmapPath: str):
         super().__init__()
 
         self.defaultStyleSheet = self.styleSheet()
+
+        self.isSelected = False
 
         self.iconLabel = QLabel()
         self.iconLabel.setPixmap(QPixmap(pixmapPath).scaled(24, 24, transformMode=Qt.SmoothTransformation))
@@ -28,13 +32,22 @@ class LabeledIconButton(QFrame):
         self.setLayout(layout)
 
     def event(self, event):
-        if event.type() == QEvent.HoverEnter:
-            self.iconLabel.setStyleSheet("QLabel {color: #FFFFFF}")
-            self.textLabel.setStyleSheet("QLabel {color: #FFFFFF}")
-        elif event.type() == QEvent.HoverLeave:
-            self.iconLabel.setStyleSheet(self.defaultStyleSheet)
-            self.textLabel.setStyleSheet(self.defaultStyleSheet)
+        if not self.isSelected:
+            if event.type() == QEvent.HoverEnter:
+                self.iconLabel.setStyleSheet("QLabel {color: #FFFFFF}")
+                self.textLabel.setStyleSheet("QLabel {color: #FFFFFF}")
+            elif event.type() == QEvent.HoverLeave:
+                self.iconLabel.setStyleSheet(self.defaultStyleSheet)
+                self.textLabel.setStyleSheet(self.defaultStyleSheet)
         return super().event(event)
 
     def mousePressEvent(self, ev: QMouseEvent) -> None:
         self.clicked.emit()
+
+    def selected(self):
+        self.isSelected = True
+        self.textLabel.setStyleSheet(self.selectedStyleSheet)
+
+    def deselected(self):
+        self.isSelected = False
+        self.textLabel.setStyleSheet(self.defaultStyleSheet)

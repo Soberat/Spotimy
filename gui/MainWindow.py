@@ -18,6 +18,7 @@ import resources
 # TODO: Implement "Add to playlist" (local tracks cannot be added via API)
 # TODO: Try to improve Slider handle
 # TODO: Modify track stylesheet if is playing and is in context
+# TODO: Fix crash when in private session
 
 
 # pyrcc5 -o resources.py res/resources.qrc
@@ -111,6 +112,9 @@ class MainWindow(QMainWindow):
             playlist.ownerName = self.spotify.get_current_user().name
             playlist.ownerPicture = self.spotify.get_current_user().image
             self.playlistViews[playlist.name] = (PlaylistViewWidget(playlist), self.spotify.get_saved_tracks())
+            self.playlistListView.likedSongsButton.selected()
+        else:
+            self.playlistListView.likedSongsButton.deselected()
 
         if playlist.name not in self.playlistViews.keys():
             self.playlistViews[playlist.name] = (PlaylistViewWidget(playlist), self.spotify.get_playlist_tracks(playlist))
