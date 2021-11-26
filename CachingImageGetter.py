@@ -9,6 +9,10 @@ import json
 
 def get_image(uri: str):
 
+    # bad
+    if uri is None:
+        return QPixmap('')
+
     if uri.startswith(":/"):
         return QPixmap(uri)
 
