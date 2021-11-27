@@ -51,7 +51,7 @@ class Playlist:
         self.id = playlistData['id']
         self.name = playlistData['name']
         self.ownerName = playlistData['owner']['display_name']
-        self.ownerPicture = playlistData['ownerPicture']
+        self.ownerPicture = None
         self.snapshotId = playlistData['snapshot_id']
         self.playlistUri = playlistData['uri']
 
@@ -253,6 +253,10 @@ class Spotify:
     def reorder_playlist(self, playlistId, rangeStart, insertBefore, snapshotId=None):
         newSnapshotId = self.sp.playlist_reorder_items(playlist_id=playlistId, range_start=rangeStart,
                                                        insert_before=insertBefore, snapshot_id=snapshotId)
+
+    def add_new_playlist(self):
+        currentUser = self.sp.current_user()
+        return Playlist(self.sp.user_playlist_create(currentUser['id'], "New playlist"))
 
 
 class WorkerSignals(QObject):

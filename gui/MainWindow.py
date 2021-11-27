@@ -19,7 +19,9 @@ import resources
 # TODO: Try to improve Slider handle
 # TODO: Modify track stylesheet if is playing and is in context
 # TODO: Fix crash when in private session
-
+# TODO: Fix crash when no device is active
+# TODO: Opening a playlist for the first time signals 2 times
+# TODO: Switching from playlist to liked back to playlist does not work
 
 # pyrcc5 -o resources.py res/resources.qrc
 
@@ -71,6 +73,7 @@ class MainWindow(QMainWindow):
             self.playlistListView.add_item(playlist)
         self.playlistListView.selectionChanged.connect(self.change_playlist)
         self.playlistListView.openLiked.connect(self.change_playlist)
+        self.playlistListView.newPlaylist.connect(self.new_playlist)
 
         self.playlistView = PlaylistViewWidget(PlaylistListViewWidget.dummyPlaylist)
 
@@ -155,6 +158,12 @@ class MainWindow(QMainWindow):
         self.playbackToolbar.widget.set_track(states[0])
         self.playbackToolbar.widget.set_volume(states[1].volume)
         self.playbackToolbar.widget.set_playback_state(states[2])
+
+    def new_playlist(self):
+        # Add item at index 0, same as Spotify does
+        self.playlistListView.add_item(self.spotify.add_new_playlist(), 0)
+        # Select the item, which also emits selectionChanged
+        self.playlistListView.playlistList.setCurrentIndex(self.playlistListView.playlistList.model().index(0, 0, self.playlistListView.playlistList.rootIndex()))
 
 
 app = QApplication(sys.argv)

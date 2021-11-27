@@ -11,8 +11,6 @@ from gui.LabeledIconButton import LabeledIconButton
 from gui.PlaylistListItemWidget import PlaylistListItemWidget
 import resources
 
-# TODO: Implement new playlist buttons functionalities
-
 
 class PlaylistListWidget(QListWidget):
     # Reordering playlist is per session, it cannot be reflected in Spotify using API
@@ -65,6 +63,7 @@ class PlaylistListViewWidget(QWidget):
     COLUMN_WIDTH = 250
     selectionChanged = pyqtSignal(Playlist)
     openLiked = pyqtSignal(Playlist)
+    newPlaylist = pyqtSignal()
 
     dummyPlaylist = Playlist({'images': list(),
                               'id': '',
@@ -90,7 +89,7 @@ class PlaylistListViewWidget(QWidget):
         self.setLayout(layout)
 
         self.newPlaylistButton = LabeledIconButton("New playlist", ":/playlist_new.png")
-        self.newPlaylistButton.clicked.connect(lambda: print("New playlist not implemented!"))
+        self.newPlaylistButton.clicked.connect(self.new_playlist)
         self.newPlaylistButton.setFixedWidth(self.COLUMN_WIDTH)
         layout.addWidget(self.newPlaylistButton, alignment=Qt.AlignLeft)
 
@@ -105,12 +104,17 @@ class PlaylistListViewWidget(QWidget):
         layout.addWidget(frame)
         layout.addWidget(self.playlistList)
 
-    def add_item(self, playlist: Playlist):
+    def add_item(self, playlist: Playlist, idx=None):
         itemWidget = PlaylistListItemWidget(playlist)
-        qListWidgetItem = QListWidgetItem(self.playlistList)
+        if idx is not None:
+            qListWidgetItem = QListWidgetItem()
+            self.playlistList.insertItem(idx, qListWidgetItem)
+        else:
+            qListWidgetItem = QListWidgetItem(self.playlistList)
+            self.playlistList.addItem(qListWidgetItem)
         qListWidgetItem.setSizeHint(itemWidget.sizeHint())
-        self.playlistList.addItem(qListWidgetItem)
         self.playlistList.setItemWidget(qListWidgetItem, itemWidget)
+        return playlist
 
     def selection_changed(self):
         try:
@@ -127,6 +131,9 @@ class PlaylistListViewWidget(QWidget):
         selection.selected()
         self.previousSelection = selection
         self.selectionChanged.emit(selection.playlist)
+
+    def new_playlist(self):
+        self.newPlaylist.emit()
 
     def open_liked(self):
         self.playlistList.itemSelectionChanged.disconnect(self.selection_changed)
