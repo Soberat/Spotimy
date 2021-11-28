@@ -3,7 +3,7 @@ from PyQt5.QtGui import QPixmap, QIcon, QMouseEvent, QFont
 from PyQt5.QtWidgets import QToolBar, QHBoxLayout, QPushButton, QWidget, QLabel, QVBoxLayout, QSlider
 
 import CachingImageGetter
-from Spotify import Track, PlaybackState
+from Spotify import Track, PlaybackState, Device
 
 
 # TODO: Color buttons when hovered
@@ -170,6 +170,10 @@ class PlaybackWidget(QWidget):
         self.setMinimumWidth(1000)
 
     def set_track(self, track: Track):
+
+        if track is None:
+            return
+
         self.track = track
         self.trackCoverLabel.setPixmap(CachingImageGetter.get_image(track.albumCoverUri).scaled(self.albumCoverSize, self.albumCoverSize, transformMode=Qt.SmoothTransformation))
         self.titleLabel.setText(track.title)
@@ -186,6 +190,10 @@ class PlaybackWidget(QWidget):
             self.maximizeButton.width() + self.volumeSlider.width() + self.volumeButton.width() + self.devicesButton.width() + self.queueButton.width() - self.trackCoverLabel.width())
 
     def set_playback_state(self, playbackState: PlaybackState):
+
+        if playbackState is None:
+            return
+
         # set shuffle
 
         # Set playing status
@@ -202,8 +210,9 @@ class PlaybackWidget(QWidget):
         self.trackSlider.setValue(playbackState.position)
         # set loop
 
-    def set_volume(self, value):
-        self.volumeSlider.setValue(value)
+    def set_device(self, device: Device):
+        if device is not None:
+            self.volumeSlider.setValue(device.volume)
 
     def shuffle_pushed(self):
         self.shuffleState = not self.shuffleState

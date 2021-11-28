@@ -158,9 +158,12 @@ class MainWindow(QMainWindow):
         self.spotify.play_track(context, track)
 
     def set_playback_state(self, states: tuple):
-        self.playbackToolbar.widget.set_track(states[0])
-        self.playbackToolbar.widget.set_volume(states[1].volume)
-        self.playbackToolbar.widget.set_playback_state(states[2])
+        if not states[1].isPrivateSession:
+            self.playbackToolbar.widget.set_track(states[0])
+            self.playbackToolbar.widget.set_device(states[1])
+            self.playbackToolbar.widget.set_playback_state(states[2])
+        else:
+            self.playbackToolbar.widget.set_device(states[1])
 
     def new_playlist(self):
         # Add item at index 0, same as Spotify does
