@@ -2,7 +2,7 @@ import copy
 import webbrowser
 from typing import Union
 from PyQt5.QtCore import Qt, pyqtSignal, QPoint
-from PyQt5.QtGui import QDrag, QMouseEvent
+from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QListWidget, QListWidgetItem, QAbstractItemView, QMenu, QAction, \
     QFrame, QListView
 
@@ -15,10 +15,12 @@ import resources
 class PlaylistListWidget(QListWidget):
 
     deletePlaylist = pyqtSignal(Playlist)
+    listChanged = pyqtSignal(set)
 
     # Reordering playlist is per session, it cannot be reflected in Spotify using API
     def __init__(self):
         super().__init__()
+        self.playlists = set()
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.open_menu)
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
@@ -54,8 +56,25 @@ class PlaylistListWidget(QListWidget):
 
     def delete_playlist(self):
         if len(self.selectedItems()) != 0:
-            self.deletePlaylist.emit(self.itemWidget(self.selectedItems()[0]).playlist)
+            playlistToDelete = self.itemWidget(self.selectedItems()[0]).playlist
+            self.deletePlaylist.emit(playlistToDelete)
             self.takeItem(self.selectedIndexes()[0].row())
+            self.playlists.remove(playlistToDelete)
+            self.listChanged.emit(self.playlists)
+
+    def add_item(self, playlist: Playlist, idx=None):
+        itemWidget = PlaylistListItemWidget(playlist)
+        if idx is not None:
+            qListWidgetItem = QListWidgetItem()
+            self.insertItem(idx, qListWidgetItem)
+        else:
+            qListWidgetItem = QListWidgetItem(self)
+            self.addItem(qListWidgetItem)
+        qListWidgetItem.setSizeHint(itemWidget.sizeHint())
+        self.setItemWidget(qListWidgetItem, itemWidget)
+        self.playlists.add(playlist)
+        self.listChanged.emit(self.playlists)
+        return playlist
 
 
 class PlaylistListViewWidget(QWidget):
@@ -101,18 +120,6 @@ class PlaylistListViewWidget(QWidget):
         frame.setFrameShape(QFrame.HLine)
         layout.addWidget(frame)
         layout.addWidget(self.playlistList)
-
-    def add_item(self, playlist: Playlist, idx=None):
-        itemWidget = PlaylistListItemWidget(playlist)
-        if idx is not None:
-            qListWidgetItem = QListWidgetItem()
-            self.playlistList.insertItem(idx, qListWidgetItem)
-        else:
-            qListWidgetItem = QListWidgetItem(self.playlistList)
-            self.playlistList.addItem(qListWidgetItem)
-        qListWidgetItem.setSizeHint(itemWidget.sizeHint())
-        self.playlistList.setItemWidget(qListWidgetItem, itemWidget)
-        return playlist
 
     def selection_changed(self):
         try:

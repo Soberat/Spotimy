@@ -71,7 +71,7 @@ class MainWindow(QMainWindow):
 
         self.playlistListView = PlaylistListViewWidget()
         for playlist in self.spotify.get_user_playlists():
-            self.playlistListView.add_item(playlist)
+            self.playlistListView.playlistList.add_item(playlist)
         self.playlistListView.selectionChanged.connect(self.change_playlist)
         self.playlistListView.openLiked.connect(self.change_playlist)
         self.playlistListView.newPlaylist.connect(self.new_playlist)
@@ -169,7 +169,7 @@ class MainWindow(QMainWindow):
 
     def new_playlist(self):
         # Add item at index 0, same as Spotify does
-        self.playlistListView.add_item(self.spotify.add_new_playlist(), 0)
+        self.playlistListView.playlistList.add_item(self.spotify.add_new_playlist(), 0)
         # Select the item, which also emits selectionChanged
         self.playlistListView.playlistList.setCurrentIndex(self.playlistListView.playlistList.model().index(0, 0, self.playlistListView.playlistList.rootIndex()))
 
