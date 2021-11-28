@@ -256,6 +256,9 @@ class Spotify:
     def add_new_playlist(self):
         return Playlist(self.sp.user_playlist_create(self.user.id, "New playlist"), self.user)
 
+    def unfollow_playlist(self, user: User, playlist: Playlist):
+        self.sp.user_playlist_unfollow(user.id, playlist.id)
+
 
 class WorkerSignals(QObject):
     stateReady = pyqtSignal(tuple)

@@ -74,6 +74,7 @@ class MainWindow(QMainWindow):
         self.playlistListView.selectionChanged.connect(self.change_playlist)
         self.playlistListView.openLiked.connect(self.change_playlist)
         self.playlistListView.newPlaylist.connect(self.new_playlist)
+        self.playlistListView.playlistList.deletePlaylist.connect(self.delete_playlist)
 
         self.playlistView = PlaylistViewWidget(PlaylistListViewWidget.dummyPlaylist)
 
@@ -126,7 +127,10 @@ class MainWindow(QMainWindow):
             self.playlistView.playTrack.disconnect(self.play_track)
         except TypeError:
             pass
-        self.playlistView.setParent(None)
+        try:
+            self.playlistView.setParent(None)
+        except RuntimeError:
+            pass
         self.playlistView, self.trackGenerator = self.playlistViews[playlist.name]
         self.playlistView.setParent(self)
         self.playlistView.trackList.orderChanged.connect(self.update_order)
@@ -163,6 +167,12 @@ class MainWindow(QMainWindow):
         self.playlistListView.add_item(self.spotify.add_new_playlist(), 0)
         # Select the item, which also emits selectionChanged
         self.playlistListView.playlistList.setCurrentIndex(self.playlistListView.playlistList.model().index(0, 0, self.playlistListView.playlistList.rootIndex()))
+
+    def delete_playlist(self, playlist):
+        self.spotify.unfollow_playlist(playlist.owner, playlist)
+        x, _ = self.playlistViews[playlist.name]
+        x.deleteLater()
+        self.playlistViews.pop(playlist.name)
 
 
 app = QApplication(sys.argv)

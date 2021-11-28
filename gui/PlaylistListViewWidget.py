@@ -6,13 +6,16 @@ from PyQt5.QtGui import QDrag, QMouseEvent
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QListWidget, QListWidgetItem, QAbstractItemView, QMenu, QAction, \
     QFrame, QListView
 
-from Spotify import Playlist
+from Spotify import Playlist, User
 from gui.LabeledIconButton import LabeledIconButton
 from gui.PlaylistListItemWidget import PlaylistListItemWidget
 import resources
 
 
 class PlaylistListWidget(QListWidget):
+
+    deletePlaylist = pyqtSignal(Playlist)
+
     # Reordering playlist is per session, it cannot be reflected in Spotify using API
     def __init__(self):
         super().__init__()
@@ -37,13 +40,22 @@ class PlaylistListWidget(QListWidget):
         openInSpotify = QAction("Open in Spotify", self)
         openInSpotify.triggered.connect(self.open_playlist)
 
+        unfollowPlaylist = QAction("Delete playlist", self)
+        unfollowPlaylist.triggered.connect(self.delete_playlist)
+
         menu.addAction(openInSpotify)
+        menu.addAction(unfollowPlaylist)
 
         menu.exec_(self.mapToGlobal(point))
 
     def open_playlist(self):
         if len(self.selectedItems()) != 0:
             webbrowser.open(self.itemWidget(self.selectedItems()[0]).playlist.playlistUri)
+
+    def delete_playlist(self):
+        if len(self.selectedItems()) != 0:
+            self.deletePlaylist.emit(self.itemWidget(self.selectedItems()[0]).playlist)
+            self.takeItem(self.selectedIndexes()[0].row())
 
     def mousePressEvent(self, e: QMouseEvent) -> None:
         if e.button() == Qt.RightButton:
@@ -125,7 +137,10 @@ class PlaylistListViewWidget(QWidget):
             return
 
         if self.previousSelection is not None:
-            self.previousSelection.deselected()
+            try:
+                self.previousSelection.deselected()
+            except RuntimeError:
+                pass
         selection.selected()
         self.previousSelection = selection
         self.selectionChanged.emit(selection.playlist)
@@ -136,7 +151,10 @@ class PlaylistListViewWidget(QWidget):
     def open_liked(self):
         self.playlistList.itemSelectionChanged.disconnect(self.selection_changed)
         if self.previousSelection is not None:
-            self.previousSelection.deselected()
+            try:
+                self.previousSelection.deselected()
+            except RuntimeError:
+                pass
         playlist = copy.copy(self.dummyPlaylist)
         playlist.image = ":/playlist_liked.png"
         playlist.name = "Liked songs"
