@@ -57,18 +57,6 @@ class PlaylistListWidget(QListWidget):
             self.deletePlaylist.emit(self.itemWidget(self.selectedItems()[0]).playlist)
             self.takeItem(self.selectedIndexes()[0].row())
 
-    def mousePressEvent(self, e: QMouseEvent) -> None:
-        if e.button() == Qt.RightButton:
-            # self.selectionModel().select(self.indexAt(e.pos()), QItemSelectionModel.SelectionFlag.Select)
-            return
-        super().mousePressEvent(e)
-
-    def mouseReleaseEvent(self, e: QMouseEvent) -> None:
-        if e.button() == Qt.RightButton:
-            # self.selectionModel().select(self.indexAt(e.pos()), QItemSelectionModel.SelectionFlag.Select)
-            return
-        super().mouseReleaseEvent(e)
-
 
 class PlaylistListViewWidget(QWidget):
 
