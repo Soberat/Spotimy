@@ -1,4 +1,6 @@
 import sys
+import webbrowser
+
 from PyQt5.QtCore import QTimer, Qt, QThreadPool
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QGridLayout
 from PlaylistListViewWidget import PlaylistListViewWidget
@@ -18,10 +20,9 @@ import resources
 # TODO: Implement "Add to playlist" (local tracks cannot be added via API)
 # TODO: Try to improve Slider handle
 # TODO: Modify track stylesheet if is playing and is in context
-# TODO: Fix crash when in private session
-# TODO: Fix crash when no device is active
 # TODO: Opening a playlist for the first time signals 2 times
 # TODO: Switching from playlist to liked back to playlist does not work
+# TODO: Indicate private session
 
 # pyrcc5 -o resources.py res/resources.qrc
 
@@ -155,7 +156,8 @@ class MainWindow(QMainWindow):
         self.spotify.reorder_playlist(self.playlistView.playlist.id, x, y)
 
     def play_track(self, context, track):
-        self.spotify.play_track(context, track)
+        if not self.spotify.play_track(context, track):
+            webbrowser.open(track)
 
     def set_playback_state(self, states: tuple):
         if not states[1].isPrivateSession:

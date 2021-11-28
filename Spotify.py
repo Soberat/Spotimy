@@ -82,6 +82,20 @@ class PlaylistTrack:
         self.track = Track(playlistTrackData['track'])
 
 
+def ThrowsSpotifyException(fn):
+    from functools import wraps
+
+    @wraps(fn)
+    def wrapper(self, *args, **kwargs):
+        try:
+            return fn(self, *args, **kwargs)
+        except SpotifyException as se:
+            print(se.reason)
+            return False
+
+    return wrapper
+
+
 class Spotify:
     scope = ["ugc-image-upload",
              "playlist-modify-private",
@@ -182,6 +196,9 @@ class Spotify:
 
     def get_current_playback(self):
         playback = self.sp.current_playback()
+        if playback['device']['is_private_session']:
+            return None, Device(playback['device']), None
+
         if playback is not None:
             self.currentDevice = Device(playback['device'])
             return Track(playback['item']), self.currentDevice, PlaybackState(shuffle=playback['shuffle_state'],
@@ -209,21 +226,26 @@ class Spotify:
         if newDeviceList != self.deviceList:
             self.deviceList = newDeviceList
 
+    @ThrowsSpotifyException
     def get_active_device(self):
         self.__update_devices()
         return self.currentDevice
 
+    @ThrowsSpotifyException
     def get_current_user(self):
         return self.user
 
+    @ThrowsSpotifyException
     def set_shuffle(self, state: bool):
         self.__update_devices()
         self.sp.shuffle(state)
 
+    @ThrowsSpotifyException
     def previous_track(self):
         self.__update_devices()
         self.sp.previous_track()
 
+    @ThrowsSpotifyException
     def play_pause(self, play: bool):
         try:
             if play:
@@ -233,15 +255,19 @@ class Spotify:
         except SpotifyException:
             pass
 
+    @ThrowsSpotifyException
     def next_track(self):
         self.sp.next_track()
 
+    @ThrowsSpotifyException
     def next_repeat_mode(self):
         self.sp.repeat()
 
+    @ThrowsSpotifyException
     def set_volume(self, value):
         self.sp.volume(value)
 
+    @ThrowsSpotifyException
     def play_track(self, context, targetUri):
         if "spotify:local" not in targetUri:
             if context == '':
@@ -249,13 +275,16 @@ class Spotify:
             else:
                 self.sp.start_playback(context_uri=context, offset={"uri": targetUri})
 
+    @ThrowsSpotifyException
     def reorder_playlist(self, playlistId, rangeStart, insertBefore, snapshotId=None):
         newSnapshotId = self.sp.playlist_reorder_items(playlist_id=playlistId, range_start=rangeStart,
                                                        insert_before=insertBefore, snapshot_id=snapshotId)
 
+    @ThrowsSpotifyException
     def add_new_playlist(self):
         return Playlist(self.sp.user_playlist_create(self.user.id, "New playlist"), self.user)
 
+    @ThrowsSpotifyException
     def unfollow_playlist(self, user: User, playlist: Playlist):
         self.sp.user_playlist_unfollow(user.id, playlist.id)
 
