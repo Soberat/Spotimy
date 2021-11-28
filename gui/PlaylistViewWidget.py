@@ -11,13 +11,13 @@ from gui.PlaylistItemWidget import PlaylistItemWidget
 from gui.TrackListWidget import TrackListWidget
 import resources
 
+
 # TODO: Add "Move to index" context menu option
 # TODO: Split header info string into multiple labels
 # TODO: Add gradient as background
 
 
 class PlaylistViewWidget(QWidget):
-
     playTrack = pyqtSignal(str, str)
 
     def __init__(self, playlist: Playlist):
@@ -42,9 +42,9 @@ class PlaylistViewWidget(QWidget):
 
         self.ownerPictureLabel = QLabel()
         self.ownerPictureLabel.setFixedHeight(40)
-        if playlist.ownerPicture is not None:
-            picture = CachingImageGetter.get_image(playlist.ownerPicture).scaled(512, 512,
-                                                                                 transformMode=Qt.SmoothTransformation)
+        if playlist.owner.image is not None:
+            picture = CachingImageGetter.get_image(playlist.owner.image).scaled(512, 512,
+                                                                                transformMode=Qt.SmoothTransformation)
         else:
             picture = QPixmap(':/pfp_placeholder.png').scaled(512, 512)
         mask = QImage(':/pfp_mask.png').createAlphaMask()
@@ -54,6 +54,7 @@ class PlaylistViewWidget(QWidget):
         self.infoLabel = QLabel()
         self.infoLabel.setFont(QFont('Gotham', 12, QFont.Normal))
         self.infoLabel.setFixedHeight(40)
+        self.infoLabel.setText(f"{self.playlist.owner.name} ▴ 0 tracks ▴ 0h 0m")
 
         self.trackList = TrackListWidget()
 
@@ -91,7 +92,7 @@ class PlaylistViewWidget(QWidget):
         itemWidget.playTrack.connect(lambda trackUri: self.playTrack.emit(self.playlist.playlistUri, trackUri))
         self.trackList.add_widget(itemWidget)
         self.infoLabel.setText(
-            f"{self.playlist.ownerName} ▴ {len(self.trackList)} tracks ▴ {int(self.totalRuntime / 3600000)}h {int(self.totalRuntime / 60000 - 60 * int(self.totalRuntime / 3600000))}m")
+            f"{self.playlist.owner.name} ▴ {len(self.trackList)} tracks ▴ {int(self.totalRuntime / 3600000)}h {int(self.totalRuntime / 60000 - 60 * int(self.totalRuntime / 3600000))}m")
 
     def list_selection_changed(self):
         selectedWidgets = set([self.trackList.itemWidget(item) for item in self.trackList.selectedItems()])

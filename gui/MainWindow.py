@@ -112,8 +112,7 @@ class MainWindow(QMainWindow):
             return
 
         if playlist.name == "Liked songs":
-            playlist.ownerName = self.spotify.get_current_user().name
-            playlist.ownerPicture = self.spotify.get_current_user().image
+            playlist.owner = self.spotify.get_current_user()
             self.playlistViews[playlist.name] = (PlaylistViewWidget(playlist), self.spotify.get_saved_tracks())
             self.playlistListView.likedSongsButton.selected()
         else:

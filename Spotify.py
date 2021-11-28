@@ -20,11 +20,13 @@ class PlaybackState:
 
 class User:
     def __init__(self, userData):
+        self.json = userData
         self.name = userData['display_name']
         try:
             self.image = userData['images'][0]['url']
         except IndexError:
             self.image = None
+        self.id = userData['id']
         self.uri = userData['uri']
 
 
@@ -43,15 +45,14 @@ class Device:
 
 
 class Playlist:
-    def __init__(self, playlistData: dict):
+    def __init__(self, playlistData: dict, owner: User):
         try:
             self.image = playlistData['images'][0]['url']
         except IndexError:
             self.image = None
         self.id = playlistData['id']
         self.name = playlistData['name']
-        self.ownerName = playlistData['owner']['display_name']
-        self.ownerPicture = None
+        self.owner = owner
         self.snapshotId = playlistData['snapshot_id']
         self.playlistUri = playlistData['uri']
 
@@ -113,14 +114,15 @@ class Spotify:
                                       client_secret=SPOTIPY_CLIENT_SECRET,
                                       redirect_uri=SPOTIPY_REDIRECT_URI))
 
+        self.user = User(self.sp.current_user())
+
     # TODO: Cache
     def get_user_playlists(self):
         # Use cached result if possible
         if self.__userPlaylistsFullDict is None:
             self.__userPlaylistsFullDict = self.sp.current_user_playlists()['items']
         for playlist in self.__userPlaylistsFullDict:
-            playlist['ownerPicture'] = self.sp.user(playlist['owner']['id'])['images'][0]['url']
-            yield Playlist(playlistData=playlist)
+            yield Playlist(playlistData=playlist, owner=User(self.sp.user(playlist['owner']['id'])))
 
     def get_saved_tracks(self):
         # Saved tracks are not cached, since they don't have a snapshot ID
@@ -154,8 +156,7 @@ class Spotify:
             snapshot['image'] = playlist.image
             snapshot['id'] = playlist.id
             snapshot['name'] = playlist.name
-            snapshot['ownerName'] = playlist.ownerName
-            snapshot['ownerPicture'] = playlist.ownerPicture
+            snapshot['owner'] = playlist.owner.json
             snapshot['snapshot_id'] = playlist.snapshotId
             snapshot['tracks'] = []
 
@@ -212,9 +213,8 @@ class Spotify:
         self.__update_devices()
         return self.currentDevice
 
-    # Todo cache
     def get_current_user(self):
-        return User(self.sp.current_user())
+        return self.user
 
     def set_shuffle(self, state: bool):
         self.__update_devices()
@@ -234,7 +234,6 @@ class Spotify:
             pass
 
     def next_track(self):
-        self.__update_devices()
         self.sp.next_track()
 
     def next_repeat_mode(self):
@@ -255,8 +254,7 @@ class Spotify:
                                                        insert_before=insertBefore, snapshot_id=snapshotId)
 
     def add_new_playlist(self):
-        currentUser = self.sp.current_user()
-        return Playlist(self.sp.user_playlist_create(currentUser['id'], "New playlist"))
+        return Playlist(self.sp.user_playlist_create(self.user.id, "New playlist"), self.user)
 
 
 class WorkerSignals(QObject):

@@ -68,10 +68,8 @@ class PlaylistListViewWidget(QWidget):
     dummyPlaylist = Playlist({'images': list(),
                               'id': '',
                               'name': "No playlist!",
-                              'owner': {'display_name': ''},
-                              'ownerPicture': None,
                               'snapshot_id': '',
-                              'uri': ''})
+                              'uri': ''}, User({'display_name': '', 'images': [{'url': None}], 'uri': None, 'id': ''}))
 
     def __init__(self):
         super().__init__()
