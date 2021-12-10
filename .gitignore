@@ -1,4 +1,5 @@
 /token.pickle
+/token.json
 /client_secret.json
 /.cache
 /Secrets.py
