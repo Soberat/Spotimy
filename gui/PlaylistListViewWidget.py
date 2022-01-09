@@ -15,12 +15,12 @@ import resources
 class PlaylistListWidget(QListWidget):
 
     deletePlaylist = pyqtSignal(Playlist)
-    listChanged = pyqtSignal(set)
+    listChanged = pyqtSignal(list)
 
     # Reordering playlist is per session, it cannot be reflected in Spotify using API
     def __init__(self):
         super().__init__()
-        self.playlists = set()
+        self.playlists = list()
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.open_menu)
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
@@ -72,7 +72,7 @@ class PlaylistListWidget(QListWidget):
             self.addItem(qListWidgetItem)
         qListWidgetItem.setSizeHint(itemWidget.sizeHint())
         self.setItemWidget(qListWidgetItem, itemWidget)
-        self.playlists.add(playlist)
+        self.playlists.append(playlist)
         self.listChanged.emit(self.playlists)
         return playlist
 

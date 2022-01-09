@@ -17,7 +17,6 @@ import resources
 
 # TODO: Clearing old playlist cache
 # TODO: When trying to play a local track, use "position" offset instead of uri
-# TODO: Implement "Add to playlist" (local tracks cannot be added via API)
 # TODO: Try to improve Slider handle
 # TODO: Modify track stylesheet if is playing and is in context
 # TODO: Opening a playlist for the first time signals 2 times
@@ -116,12 +115,16 @@ class MainWindow(QMainWindow):
         if playlist.name == "Liked songs":
             playlist.owner = self.spotify.get_current_user()
             self.playlistViews[playlist.name] = (PlaylistViewWidget(playlist), self.spotify.get_saved_tracks())
+            self.playlistViews[playlist.name][0].trackList.update_playlist_list(self.playlistListView.playlistList.playlists)
+            self.playlistViews[playlist.name][0].trackList.addToPlaylist.connect(self.add_to_playlist)
             self.playlistListView.likedSongsButton.selected()
         else:
             self.playlistListView.likedSongsButton.deselected()
 
         if playlist.name not in self.playlistViews.keys():
             self.playlistViews[playlist.name] = (PlaylistViewWidget(playlist), self.spotify.get_playlist_tracks(playlist))
+            self.playlistViews[playlist.name][0].trackList.update_playlist_list(self.playlistListView.playlistList.playlists)
+            self.playlistViews[playlist.name][0].trackList.addToPlaylist.connect(self.add_to_playlist)
 
         try:
             self.playlistView.trackList.orderChanged.disconnect(self.update_order)
@@ -178,6 +181,9 @@ class MainWindow(QMainWindow):
         x, _ = self.playlistViews[playlist.name]
         x.deleteLater()
         self.playlistViews.pop(playlist.name)
+
+    def add_to_playlist(self, playlist: Playlist, items: list):
+        self.spotify.add_to_playlist(playlist, items)
 
 
 app = QApplication(sys.argv)

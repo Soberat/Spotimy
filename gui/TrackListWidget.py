@@ -5,13 +5,19 @@ from PyQt5.QtCore import pyqtSignal, Qt, QPoint, QModelIndex
 from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QListWidget, QAbstractItemView, QMenu, QAction, QActionGroup, QListWidgetItem
 
+from Spotify import Playlist
+
 
 class TrackListWidget(QListWidget):
 
     orderChanged = pyqtSignal(int, int)
+    addToPlaylist = pyqtSignal(Playlist, list)
 
     def __init__(self):
         super().__init__()
+
+        self.playlistList = []
+
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.open_menu)
         self.model().rowsMoved.connect(self.update_indexes)
@@ -29,11 +35,20 @@ class TrackListWidget(QListWidget):
 
         moveToTop = QAction("Move to top", self)
         moveToBottom = QAction("Move to bottom", self)
+        addToPlaylistMenu = QMenu("Add to playlist")
+        playlistsActionGroup = QActionGroup(addToPlaylistMenu)
+
+        for idx, playlist in enumerate(self.playlistList):
+            playlistsActionGroup.addAction(addToPlaylistMenu.addAction(playlist.name)).setData(idx)
+
+        playlistsActionGroup.triggered.connect(self.add_to_playlist)
+
         moveToTop.triggered.connect(self.move_to_top)
         moveToBottom.triggered.connect(self.move_to_bottom)
 
         menu.addAction(moveToTop)
         menu.addAction(moveToBottom)
+        menu.addMenu(addToPlaylistMenu)
 
         # If a single song was selected, add more options
         if len(self.selectedIndexes()) == 1:
@@ -81,6 +96,16 @@ class TrackListWidget(QListWidget):
             selection = sorted(self.selectedIndexes())
         self.scrollToBottom()
 
+    def add_to_playlist(self, playlistIndex):
+        selection = self.selectedItems()
+        tracks = []
+        for item in selection:
+            track = self.itemWidget(item).playlistTrack
+            if not track.isLocal:
+                tracks.append(track.track)
+
+        self.addToPlaylist.emit(self.playlistList[playlistIndex.data()], tracks)
+
     def update_indexes(self, idx1: QModelIndex, start, stop, idx2: QModelIndex, row):
         self.orderChanged.emit(start, row)
         widgets = []
@@ -95,3 +120,6 @@ class TrackListWidget(QListWidget):
         myQListWidgetItem.setSizeHint(itemWidget.sizeHint())
         self.addItem(myQListWidgetItem)
         self.setItemWidget(myQListWidgetItem, itemWidget)
+
+    def update_playlist_list(self, playlistList):
+        self.playlistList = playlistList

@@ -279,6 +279,12 @@ class Spotify:
     def reorder_playlist(self, playlistId, rangeStart, insertBefore, snapshotId=None):
         newSnapshotId = self.sp.playlist_reorder_items(playlist_id=playlistId, range_start=rangeStart,
                                                        insert_before=insertBefore, snapshot_id=snapshotId)
+        return newSnapshotId
+
+    @ThrowsSpotifyException
+    def add_to_playlist(self, playlist: Playlist, tracks: list):
+        self.sp.playlist_add_items(playlist.id, [track.trackUri for track in tracks])
+        return True
 
     @ThrowsSpotifyException
     def add_new_playlist(self):
