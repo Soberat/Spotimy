@@ -59,6 +59,10 @@ class TrackListWidget(QListWidget):
                 lambda: webbrowser.open(track.trackUri))
             menu.addAction(openInSpotify)
 
+            moveAlphabetical = QAction("Move up until sorted", self)
+            moveAlphabetical.triggered.connect(self.move_alphabetical)
+            menu.addAction(moveAlphabetical)
+
             if len(track.artists) == 1:
                 action = QAction("Open artist page")
                 action.triggered.connect(lambda: webbrowser.open(track.artistUris[0]))
@@ -95,6 +99,19 @@ class TrackListWidget(QListWidget):
             self.model().endMoveRows()
             selection = sorted(self.selectedIndexes())
         self.scrollToBottom()
+
+    def move_alphabetical(self):
+        selection = sorted(self.selectedIndexes())[0]
+        searchIndex = 1
+        artist = self.indexWidget(selection).playlistTrack.track.artists[0]
+        nextArtist = self.indexWidget(selection.siblingAtRow(selection.row() - searchIndex)).playlistTrack.track.artists[0]
+        while artist < nextArtist:
+            searchIndex += 1
+            nextArtist = self.indexWidget(selection.siblingAtRow(selection.row() - searchIndex)).playlistTrack.track.artists[0]
+
+        self.model().beginMoveRows(self.rootIndex(), selection.row(), selection.row(), self.rootIndex(), selection.row() - searchIndex + 1)
+        self.model().endMoveRows()
+        self.scrollTo(selection.siblingAtRow(selection.row() - searchIndex + 1))
 
     def add_to_playlist(self, playlistIndex):
         selection = self.selectedItems()
