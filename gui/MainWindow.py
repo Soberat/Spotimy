@@ -22,6 +22,8 @@ import resources
 # TODO: Opening a playlist for the first time signals 2 times
 # TODO: Switching from playlist to liked back to playlist does not work
 # TODO: Indicate private session
+# TODO: Full screen player
+# TODO: Playlist double click play
 
 # pyrcc5 -o resources.py res/resources.qrc
 
@@ -164,7 +166,7 @@ class MainWindow(QMainWindow):
             webbrowser.open(track)
 
     def set_playback_state(self, states: tuple):
-        if not states[1].isPrivateSession:
+        if states[1] is not None and not states[1].isPrivateSession:
             self.playbackToolbar.widget.set_track(states[0])
             self.playbackToolbar.widget.set_device(states[1])
             self.playbackToolbar.widget.set_playback_state(states[2])

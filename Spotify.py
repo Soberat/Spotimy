@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import time
@@ -69,6 +70,10 @@ class Track:
         self.album = trackData['album']['name']
         self.runtime: int = trackData['duration_ms']
         self.trackUri = trackData['uri']
+        try:
+            self.year = trackData['album']['release_date'].split(sep="-")[0]
+        except AttributeError:
+            self.year = datetime.datetime.year
 
 
 class PlaylistTrack:
