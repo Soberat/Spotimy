@@ -5,3 +5,7 @@
 /Secrets.py
 /gui/cache/*
 /gui/.cache
+*.pyc
+/gui/cache/
+/.idea/
+/cache
