@@ -203,7 +203,7 @@ class Spotify:
 
     def get_current_playback(self):
         playback = self.sp.current_playback()
-        if playback['device']['is_private_session']:
+        if playback is not None and playback['device']['is_private_session']:
             return None, Device(playback['device']), None
 
         if playback is not None:

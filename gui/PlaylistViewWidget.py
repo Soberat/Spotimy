@@ -12,7 +12,6 @@ from gui.TrackListWidget import TrackListWidget
 import resources
 
 
-# TODO: Add "Move to index" context menu option
 # TODO: Split header info string into multiple labels
 # TODO: Add gradient as background
 
