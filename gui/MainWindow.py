@@ -95,6 +95,7 @@ class MainWindow(QMainWindow):
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
         self.setWindowIcon(QIcon(":/icon.png"))
+        self.setWindowTitle("Spotimy")
 
     def create_central_widget(self):
         centralWidget = QWidget()
