@@ -287,6 +287,10 @@ class Spotify:
         return True
 
     @ThrowsSpotifyException
+    def remove_from_playlist(self, playlist: Playlist, tracks: list):
+        self.sp.playlist_remove_specific_occurrences_of_items(playlist.id, [{"uri": playlistTrack.track.trackUri, "positions": [playlistTrack.index-1]} for playlistTrack in tracks])
+
+    @ThrowsSpotifyException
     def add_new_playlist(self):
         return Playlist(self.sp.user_playlist_create(self.user.id, "New playlist"), self.user)
 

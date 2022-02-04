@@ -2,8 +2,8 @@ import webbrowser
 from typing import Union
 
 from PyQt5.QtCore import pyqtSignal, Qt, QPoint, QModelIndex
-from PyQt5.QtGui import QDrag
-from PyQt5.QtWidgets import QListWidget, QAbstractItemView, QMenu, QAction, QActionGroup, QListWidgetItem
+from PyQt5.QtGui import QDrag, QKeySequence
+from PyQt5.QtWidgets import QListWidget, QAbstractItemView, QMenu, QAction, QActionGroup, QListWidgetItem, QShortcut
 
 from Spotify import Playlist
 
@@ -12,6 +12,7 @@ class TrackListWidget(QListWidget):
 
     orderChanged = pyqtSignal(int, int)
     addToPlaylist = pyqtSignal(Playlist, list)
+    removeFromPlaylist = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
@@ -23,6 +24,9 @@ class TrackListWidget(QListWidget):
         self.model().rowsMoved.connect(self.update_indexes)
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setDragDropMode(QAbstractItemView.InternalMove)
+
+        self.shortcut = QShortcut(QKeySequence("Delete"), self)
+        self.shortcut.activated.connect(self.remove_from_playlist)
 
     def startDrag(self, supportedActions: Union[Qt.DropActions, Qt.DropAction]) -> None:
         drag = QDrag(self)
@@ -36,6 +40,7 @@ class TrackListWidget(QListWidget):
         moveToTop = QAction("Move to top", self)
         moveToBottom = QAction("Move to bottom", self)
         addToPlaylistMenu = QMenu("Add to playlist")
+        removeFromPlaylist = QAction("Remove from playlist", self)
         playlistsActionGroup = QActionGroup(addToPlaylistMenu)
 
         for idx, playlist in enumerate(self.playlistList):
@@ -45,9 +50,11 @@ class TrackListWidget(QListWidget):
 
         moveToTop.triggered.connect(self.move_to_top)
         moveToBottom.triggered.connect(self.move_to_bottom)
+        removeFromPlaylist.triggered.connect(self.remove_from_playlist)
 
         menu.addAction(moveToTop)
         menu.addAction(moveToBottom)
+        menu.addAction(removeFromPlaylist)
         menu.addMenu(addToPlaylistMenu)
 
         # If a single song was selected, add more options
@@ -100,6 +107,15 @@ class TrackListWidget(QListWidget):
             selection = sorted(self.selectedIndexes())
         self.scrollToBottom()
 
+    def remove_from_playlist(self):
+        selection = self.selectedItems()
+        if len(selection) > 0:
+            tracks = [self.itemWidget(item).playlistTrack for item in selection]
+            self.removeFromPlaylist.emit(tracks)
+            for item in selection:
+                self.takeItem(self.indexFromItem(item).row())
+            self.update_indexes(None, 0, None, None, 0)
+
     def move_alphabetical(self):
         selection = sorted(self.selectedIndexes())[0]
         searchIndex = 1
@@ -130,6 +146,7 @@ class TrackListWidget(QListWidget):
             widgets.append(self.itemWidget(self.item(idx)))
         for idx, widget in enumerate(widgets):
             widget.indexLabel.setText(str(idx + 1))
+            widget.playlistTrack.index = idx + 1
         self.scrollToTop()
 
     def add_widget(self, itemWidget):

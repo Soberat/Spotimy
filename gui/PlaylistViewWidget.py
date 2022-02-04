@@ -19,6 +19,7 @@ import resources
 
 class PlaylistViewWidget(QWidget):
     playTrack = pyqtSignal(str, str)
+    removeFromPlaylist = pyqtSignal(Playlist, list)
 
     def __init__(self, playlist: Playlist):
         super().__init__()
@@ -57,6 +58,7 @@ class PlaylistViewWidget(QWidget):
         self.infoLabel.setText(f"{self.playlist.owner.name} ▴ 0 tracks ▴ 0h 0m")
 
         self.trackList = TrackListWidget()
+        self.trackList.removeFromPlaylist.connect(self.remove_from_playlist)
 
         headerLayout = QHBoxLayout()
         headerLayout.addWidget(self.coverLabel, alignment=Qt.AlignBottom)
@@ -93,6 +95,9 @@ class PlaylistViewWidget(QWidget):
         self.trackList.add_widget(itemWidget)
         self.infoLabel.setText(
             f"{self.playlist.owner.name} ▴ {len(self.trackList)} tracks ▴ {int(self.totalRuntime / 3600000)}h {int(self.totalRuntime / 60000 - 60 * int(self.totalRuntime / 3600000))}m")
+
+    def remove_from_playlist(self, tracks_to_remove: list):
+        self.removeFromPlaylist.emit(self.playlist, tracks_to_remove)
 
     def list_selection_changed(self):
         selectedWidgets = set([self.trackList.itemWidget(item) for item in self.trackList.selectedItems()])

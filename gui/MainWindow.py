@@ -125,6 +125,7 @@ class MainWindow(QMainWindow):
             self.playlistViews[playlist.name] = (PlaylistViewWidget(playlist), self.spotify.get_playlist_tracks(playlist))
             self.playlistViews[playlist.name][0].trackList.update_playlist_list(self.playlistListView.playlistList.playlists)
             self.playlistViews[playlist.name][0].trackList.addToPlaylist.connect(self.add_to_playlist)
+            self.playlistViews[playlist.name][0].removeFromPlaylist.connect(self.spotify.remove_from_playlist)
 
         try:
             self.playlistView.trackList.orderChanged.disconnect(self.update_order)
