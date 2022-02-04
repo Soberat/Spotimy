@@ -21,7 +21,6 @@ import resources
 # TODO: Try to improve Slider handle
 # TODO: Modify track stylesheet if is playing and is in context
 # TODO: Opening a playlist for the first time signals 2 times
-# TODO: Switching from playlist to liked back to playlist does not work
 # TODO: Indicate private session
 # TODO: Full screen player
 

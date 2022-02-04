@@ -152,6 +152,7 @@ class PlaylistListViewWidget(QWidget):
         if self.previousSelection is not None:
             try:
                 self.previousSelection.deselected()
+                self.playlistList.clearSelection()
             except RuntimeError:
                 pass
         playlist = copy.copy(self.dummyPlaylist)
