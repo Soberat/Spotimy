@@ -2,6 +2,7 @@ import sys
 import webbrowser
 
 from PyQt5.QtCore import QTimer, Qt, QThreadPool
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QGridLayout
 from PlaylistListViewWidget import PlaylistListViewWidget
 from Spotify import Spotify, Playlist, Worker
@@ -94,6 +95,7 @@ class MainWindow(QMainWindow):
         self.setMinimumSize(1400, 800)
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
+        self.setWindowIcon(QIcon(":/icon.png"))
 
     def create_central_widget(self):
         centralWidget = QWidget()

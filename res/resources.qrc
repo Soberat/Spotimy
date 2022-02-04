@@ -21,5 +21,6 @@
         <file alias="shuffle.png">shuffle.png</file>
         <file alias="connect.png">connect.png</file>
         <file alias="queue.png">queue.png</file>
+        <file alias="icon.png">icon/icon.png</file>
     </qresource>
 </RCC>
