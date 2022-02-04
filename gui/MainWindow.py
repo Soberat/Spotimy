@@ -24,7 +24,6 @@ import resources
 # TODO: Switching from playlist to liked back to playlist does not work
 # TODO: Indicate private session
 # TODO: Full screen player
-# TODO: Playlist double click play
 
 # pyrcc5 -o resources.py res/resources.qrc
 
@@ -72,6 +71,7 @@ class MainWindow(QMainWindow):
         self.trackTimer = None
 
         self.playlistListView = PlaylistListViewWidget()
+        self.playlistListView.playPlaylist.connect(self.spotify.play_playlist)
         for playlist in self.spotify.get_user_playlists():
             self.playlistListView.playlistList.add_item(playlist)
         self.playlistListView.selectionChanged.connect(self.change_playlist)

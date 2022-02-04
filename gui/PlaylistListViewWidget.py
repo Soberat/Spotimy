@@ -16,6 +16,7 @@ class PlaylistListWidget(QListWidget):
 
     deletePlaylist = pyqtSignal(Playlist)
     listChanged = pyqtSignal(list)
+    playPlaylist = pyqtSignal(Playlist)
 
     # Reordering playlist is per session, it cannot be reflected in Spotify using API
     def __init__(self):
@@ -64,6 +65,7 @@ class PlaylistListWidget(QListWidget):
 
     def add_item(self, playlist: Playlist, idx=None):
         itemWidget = PlaylistListItemWidget(playlist)
+        itemWidget.playPlaylist.connect(self.playPlaylist.emit)
         if idx is not None:
             qListWidgetItem = QListWidgetItem()
             self.insertItem(idx, qListWidgetItem)
@@ -82,6 +84,7 @@ class PlaylistListViewWidget(QWidget):
     COLUMN_WIDTH = 250
     selectionChanged = pyqtSignal(Playlist)
     openLiked = pyqtSignal(Playlist)
+    playPlaylist = pyqtSignal(Playlist)
     newPlaylist = pyqtSignal()
 
     dummyPlaylist = Playlist({'images': list(),
@@ -98,6 +101,7 @@ class PlaylistListViewWidget(QWidget):
 
         self.playlistList.setFixedWidth(self.COLUMN_WIDTH)
         self.playlistList.itemSelectionChanged.connect(self.selection_changed)
+        self.playlistList.playPlaylist.connect(self.playPlaylist.emit)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(5, 5, 0, 0)

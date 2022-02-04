@@ -254,13 +254,10 @@ class Spotify:
 
     @ThrowsSpotifyException
     def play_pause(self, play: bool):
-        try:
-            if play:
-                self.sp.start_playback()
-            else:
-                self.sp.pause_playback()
-        except SpotifyException:
-            pass
+        if play:
+            self.sp.start_playback()
+        else:
+            self.sp.pause_playback()
 
     @ThrowsSpotifyException
     def next_track(self):
@@ -281,6 +278,11 @@ class Spotify:
                 self.sp.start_playback(uris=[targetUri])
             else:
                 self.sp.start_playback(context_uri=context, offset={"uri": targetUri})
+            return True
+
+    @ThrowsSpotifyException
+    def play_playlist(self, playlist: Playlist):
+        self.sp.start_playback(context_uri=playlist.playlistUri)
 
     @ThrowsSpotifyException
     def reorder_playlist(self, playlistId, rangeStart, insertBefore, snapshotId=None):
@@ -291,7 +293,6 @@ class Spotify:
     @ThrowsSpotifyException
     def add_to_playlist(self, playlist: Playlist, tracks: list):
         self.sp.playlist_add_items(playlist.id, [track.trackUri for track in tracks])
-        return True
 
     @ThrowsSpotifyException
     def remove_from_playlist(self, playlist: Playlist, tracks: list):

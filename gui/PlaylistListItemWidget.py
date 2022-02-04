@@ -1,5 +1,5 @@
-from PyQt5.QtCore import Qt, QEvent
-from PyQt5.QtGui import QPixmap, QFont
+from PyQt5.QtCore import Qt, QEvent, pyqtSignal
+from PyQt5.QtGui import QPixmap, QFont, QMouseEvent
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel
 
 from CachingImageGetter import get_image
@@ -9,6 +9,7 @@ from Spotify import Playlist
 class PlaylistListItemWidget(QWidget):
 
     selectedStyleSheet = "QLabel {color: #FFFFFF}"
+    playPlaylist = pyqtSignal(Playlist)
 
     def __init__(self, playlist: Playlist):
         super().__init__()
@@ -49,3 +50,6 @@ class PlaylistListItemWidget(QWidget):
     def deselected(self):
         self.isSelected = False
         self.nameLabel.setStyleSheet(self.defaultStyleSheet)
+
+    def mouseDoubleClickEvent(self, a0: QMouseEvent) -> None:
+        self.playPlaylist.emit(self.playlist)
