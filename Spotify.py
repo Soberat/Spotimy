@@ -60,6 +60,8 @@ class Playlist:
 
 class Track:
     def __init__(self, trackData: dict):
+        if trackData is None:
+            return
         try:
             self.albumCoverUri: str = trackData['album']['images'][-1]['url']
         except IndexError:
