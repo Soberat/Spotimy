@@ -1,6 +1,6 @@
 # Spotimy
 
-<img src="https://raw.githubusercontent.com/Soberat/Spotimy/master/res/icon/icon.png?token=GHSAT0AAAAAABRCQRUS53V4LZOIAKCGDZSEYP5IYNA" width="200" height="200">
+<img src="https://raw.githubusercontent.com/Soberat/Spotimy/master/res/icon/icon.png" width="200" height="200">
 
 Spotimy (pronounced Spoti-mai) is a side project of mine that tries to help managing large Spotify song libraries. It mostly fits my usage, but maybe it will be useful to someone ¯\\\_(ツ)_/¯
 
