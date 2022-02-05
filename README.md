@@ -5,7 +5,7 @@
 Spotimy (pronounced Spoti-mai) is a side project of mine that tries to help managing large Spotify song libraries. It mostly fits my usage, but maybe it will be useful to someone ¯\\\_(ツ)_/¯
 
 ## Features
-- Very suspicously familiar interface
+- Very suspiciously familiar interface
 - Move to top/bottom options for songs
 - Add and delete to playlist options
 - Mostly functional playback toolbar
